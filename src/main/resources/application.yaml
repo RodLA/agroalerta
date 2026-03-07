@@ -1,3 +1,10 @@
 spring:
   application:
     name: utp-component-agroalerta-api
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+app:
+  cors:
+    origin: ${CORS_ORIGIN}

@@ -1,4 +1,4 @@
-package com.utp.agroalerta.model;
+package com.utp.agroalerta.model.location;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +19,8 @@ public class Location {
     private Integer ubigeo;
     private String name;
     private String type;
-    private 
+    @Field("meta_info")
+    private MetaInfo metaInfo;
     @Field("is_active")
     private Boolean isActive;
 

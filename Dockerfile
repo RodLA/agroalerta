@@ -8,6 +8,6 @@ RUN mvn clean package -DskipTests
 # Package stage
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/utp-component-agroalerta-api-0.0.1-SNAPSHOT.jar .
+COPY --from=build /app/target/utp-component-agroalerta-api-1.0.0.jar .
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "utp-component-agroalerta-api-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "utp-component-agroalerta-api-1.0.0.jar"]

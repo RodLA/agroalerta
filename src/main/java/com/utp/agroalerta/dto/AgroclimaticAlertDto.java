@@ -1,24 +1,20 @@
-package com.utp.agroalerta.mappers;
+package com.utp.agroalerta.dto;
 
-import com.utp.agroalerta.dto.AgroclimaticAlertDetailDto;
-import com.utp.agroalerta.model.AgroclimaticAlert;
+import lombok.*;
 
-public class AgroclimaticAlertMapper {
+import java.time.LocalDateTime;
+import java.util.List;
 
-    public static AgroclimaticAlertDetailDto toDetailDto(AgroclimaticAlert model) {
-        if (model == null) return null;
-        return AgroclimaticAlertDetailDto.builder()
-                .id(model.getId())
-                .sourceDocument(model.getSourceDocument())
-                .riskLevel(model.getRiskLevel())
-                .eventType(model.getEventType())
-                .title(model.getTitle())
-                .summary(model.getSummary())
-                .detailedInfo(model.getDetailedInfo())
-                .affectedAreas(model.getAffectedAreas())
-                .vulnerableCrops(model.getVulnerableCrops())
-                .recommendations(model.getRecommendations())
-                .publicationAt(model.getPublicationAt())
-                .build();
-    }
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
+public class AgroclimaticAlertDto {
+    private String id;
+    private EventDto eventType;
+    private String riskLevel;
+    private String title;
+    private String summary;
+    private List<CropDto> crops;
+    private List<String> areas;
+    private SourceDto source;
+    private LocalDateTime publicationAt;
 }

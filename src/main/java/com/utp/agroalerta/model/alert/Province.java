@@ -1,4 +1,4 @@
-package com.utp.agroalerta.model;
+package com.utp.agroalerta.model.alert;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

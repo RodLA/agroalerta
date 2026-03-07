@@ -1,4 +1,4 @@
-package com.utp.agroalerta.model;
+package com.utp.agroalerta.model.alert;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class AgroclimaticAlert {
     @Field("risk_level")
     private String riskLevel;
     @Field("event_type")
-    private String eventType;
+    private EventType eventType;
     private String title;
     private String summary;
     @Field("detailed_info")

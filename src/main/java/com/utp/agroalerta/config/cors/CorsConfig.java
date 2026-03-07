@@ -7,8 +7,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @Configuration
-public class LocalCorsConfig {
+public class CorsConfig {
 
     @Value("${app.cors.origin}")
     private String origin;
@@ -17,10 +19,19 @@ public class LocalCorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(origin);
+
+        // setAllowedOriginPatterns te permite usar comodines (*)
+        config.setAllowedOriginPatterns(Arrays.asList(
+                origin, // Tu dominio principal (el que tienes en la variable de AWS)
+                "https://*-andersonle17s-projects.vercel.app", // Dominios dinámicos de Vercel
+                "http://localhost:3000" // Tu entorno local
+        ));
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

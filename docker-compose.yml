@@ -5,5 +5,5 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MONGO_URI=mongodb://your-mongo-host:27017/your-db
-      - CORS_ORIGIN=http://your-frontend-domain.com
+      - MONGO_URI=${MONGO_URI}
+      - CORS_ORIGIN=${CORS_ORIGIN}

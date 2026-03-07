@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter @Setter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class GlobalStatisticDto {
+public class StatisticDto {
 
     private Integer totalAlerts;
     private Integer criticalAlerts;

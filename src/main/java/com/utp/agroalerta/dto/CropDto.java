@@ -4,7 +4,7 @@ import lombok.*;
 
 @Getter @Setter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class CropsDto {
+public class CropDto {
     private String id;
     private String name;
 }
