@@ -42,7 +42,7 @@ downloader_table_metadata    = "metadata"
 # Credentials are managed exclusively via Secrets Manager (stgsecagromongoue1 / stgsecagrogeminiue1).
 ocr_gemini_secret_name         = "stgsecagrogeminiue1"
 ocr_model_id                   = "gemini-2.0-flash"
-ocr_shapefile_key              = "resource/shapefile/peru_provincias.zip"
+ocr_shapefile_key              = "resource/shapefile/Provincial_INEI_2023.zip"
 ocr_mongo_secret_name          = "stgsecagromongoue1"
 ocr_mongo_db_name              = "agroalerta"
 ocr_table_metadata             = "metadata"
@@ -56,7 +56,7 @@ ocr_collection_domains         = "domains"
 
 # ECR image URI for the OCR Lambda container (build & push before terraform apply)
 # Format: <account_id>.dkr.ecr.us-east-1.amazonaws.com/<repo_name>:<tag>
-lambda_ocr_image_uri = ""
+lambda_ocr_image_uri = "010594764766.dkr.ecr.us-east-1.amazonaws.com/stgecragroocrprocessorue1:latest"
 
 # ---- EventBridge ----
 eventbridge_schedule = "cron(0 1 ? * SUN *)"

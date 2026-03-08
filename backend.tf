@@ -10,5 +10,6 @@ terraform {
     key     = "agro-alerta/terraform.tfstate"
     region  = "us-east-1"
     encrypt = true
+    profile = "agro-stg"
   }
 }

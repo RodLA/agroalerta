@@ -97,3 +97,17 @@ resource "aws_s3_object" "ocr_source_backup" {
   etag         = filemd5("${path.root}/scripts/stglmbagroocrprocessorue1.zip")
 }
 
+# ---------------------------------------------------------------------------
+# Shapefile: Peru provincias (used by Lambda 3 OCR for geospatial processing)
+# Local path : resource/peru_provincias.zip
+# S3 key     : resource/shapefile/peru_provincias.zip  (matches ocr_shapefile_key)
+# ---------------------------------------------------------------------------
+
+resource "aws_s3_object" "shapefile" {
+  bucket       = aws_s3_bucket.resources.id
+  key          = "resource/shapefile/Provincial_INEI_2023.zip"
+  source       = "${path.root}/resource/Provincial_INEI_2023.zip"
+  content_type = "application/zip"
+  etag         = filemd5("${path.root}/resource/Provincial_INEI_2023.zip")
+}
+
