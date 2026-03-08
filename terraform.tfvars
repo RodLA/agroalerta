@@ -40,7 +40,6 @@ downloader_table_metadata    = "metadata"
 
 # ---- Lambda 3: OCR/IA – environment variables ----
 # Credentials are managed exclusively via Secrets Manager (stgsecagromongoue1 / stgsecagrogeminiue1).
-# Do NOT add ocr_gemini_api_key or direct credential variables here.
 ocr_gemini_secret_name         = "stgsecagrogeminiue1"
 ocr_model_id                   = "gemini-2.0-flash"
 ocr_shapefile_key              = "resource/shapefile/peru_provincias.zip"

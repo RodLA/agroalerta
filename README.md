@@ -172,8 +172,7 @@ Editar el archivo y reemplazar todos los valores `<CHANGE_ME>`:
 
 ```hcl
 scraper_mongo_secret_name  = "agro/mongo/credentials"
-lambda_ocr_image_uri       = "123456789.dkr.ecr.us-east-1.amazonaws.com/stgecragroocrprocessorue1:latest"
-ocr_gemini_api_key         = "AI..."
+lambda_ocr_image_uri       = "123456789.dkr.ecr.us-east-1.amazonaws.com/stgecragroocrprocessorue1:latest""
 # ...etc
 ```
 
