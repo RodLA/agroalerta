@@ -138,18 +138,22 @@ Esto creará únicamente el bucket `stgs3agroterraformstateue1`. **No se requier
 ### 2. Construir y Publicar la Imagen de Lambda 3 (OCR/IA)
 
 ```bash
-# Crear repositorio ECR
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+# Definir variables
 REGION=us-east-1
 REPO=stgecragroocrprocessorue1
+PROFILE=agro-stg
 
-aws ecr create-repository --repository-name $REPO --region $REGION
+# Obtener el Account ID usando el perfil específico
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile $PROFILE)
+
+# Crear repositorio ECR usando el perfil específico
+aws ecr create-repository --repository-name $REPO --region $REGION --profile $PROFILE
 
 # Login + build + push
-aws ecr get-login-password --region $REGION | \
+aws ecr get-login-password --region $REGION --profile $PROFILE | \
   docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
-docker build -t $REPO .
+docker build -t $REPO:latest .
 docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 ```
@@ -239,35 +243,33 @@ aws configure --profile agro-stg
 **1.1 Crear el repositorio ECR** con el nombre exacto de la nomenclatura del proyecto:
 
 ```bash
-ACCOUNT_ID=$(aws sts get-caller-identity --profile agro-stg --query Account --output text)
+# Definir variables
 REGION=us-east-1
 REPO=stgecragroocrprocessorue1
+PROFILE=agro-stg
 
-aws ecr create-repository \
-  --repository-name $REPO \
-  --region $REGION \
-  --profile agro-stg \
-  --image-scanning-configuration scanOnPush=true
+# Obtener el Account ID usando el perfil específico
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile $PROFILE)
+
+# Crear repositorio ECR usando el perfil específico
+aws ecr create-repository --repository-name $REPO --region $REGION --profile $PROFILE
 ```
 
 **1.2 Autenticarse, compilar y hacer push de la imagen Docker:**
 
 ```bash
 # Login al registry ECR — el flag --profile asegura autenticación en la cuenta correcta
-aws ecr get-login-password --region us-east-1 --profile agro-stg | \
-  docker login --username AWS --password-stdin \
-  $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region $REGION --profile $PROFILE | \
+  docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
 # Construir la imagen desde el Dockerfile de la Lambda 3 (OCR/IA)
 docker build -t $REPO:latest .
 
 # Etiquetar con la URI completa de ECR
-docker tag $REPO:latest \
-  $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
+docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 
 # Push al registry
-docker push \
-  $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
+docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 ```
 
 > ⚠️ **Multi-cuenta:** Omitir `--profile agro-stg` haría que Docker se autenticara con las credenciales por defecto del sistema, potencialmente subiendo la imagen a una cuenta de AWS diferente (ej. tu cuenta personal). El `profile` especificado en Terraform (`var.aws_profile = "agro-stg"`) y el perfil usado en la CLI **deben coincidir**.
