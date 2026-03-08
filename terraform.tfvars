@@ -57,7 +57,7 @@ ocr_collection_domains         = "domains"
 
 # ECR image URI for the OCR Lambda container (build & push before terraform apply)
 # Format: <account_id>.dkr.ecr.us-east-1.amazonaws.com/<repo_name>:<tag>
-lambda_ocr_image_uri = "<CHANGE_ME>"
+lambda_ocr_image_uri = ""
 
 # ---- EventBridge ----
 eventbridge_schedule = "cron(0 1 ? * SUN *)"
