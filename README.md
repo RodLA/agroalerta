@@ -153,7 +153,7 @@ aws ecr create-repository --repository-name $REPO --region $REGION --profile $PR
 aws ecr get-login-password --region $REGION --profile $PROFILE | \
   docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
-docker build -t $REPO:latest .
+docker build --no-cache --provenance=false --platform linux/amd64 -t $REPO:latest .
 docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 ```
@@ -262,13 +262,11 @@ aws ecr create-repository --repository-name $REPO --region $REGION --profile $PR
 aws ecr get-login-password --region $REGION --profile $PROFILE | \
   docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
-# Construir la imagen desde el Dockerfile de la Lambda 3 (OCR/IA)
-docker build -t $REPO:latest .
+# Construir la imagen para arquitectura amd64 (requerido por Lambda)
+docker build --no-cache --provenance=false --platform linux/amd64 -t $REPO:latest .
 
-# Etiquetar con la URI completa de ECR
+# Etiquetar y hacer push al registry ECR
 docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
-
-# Push al registry
 docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
 ```
 
