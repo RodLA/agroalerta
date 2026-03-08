@@ -144,18 +144,22 @@ REPO=stgecragroocrprocessorue1
 PROFILE=agro-stg
 
 # Obtener el Account ID usando el perfil específico
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile $PROFILE)
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile ${PROFILE})
 
-# Crear repositorio ECR usando el perfil específico
-aws ecr create-repository --repository-name $REPO --region $REGION --profile $PROFILE
+# Verificar antes de continuar
+echo "→ Account: ${ACCOUNT_ID}"   # debe ser 704618570781
+echo "→ Repo:    ${REPO}"
+
+# Crear repositorio ECR (saltar si ya existe)
+aws ecr create-repository --repository-name ${REPO} --region ${REGION} --profile ${PROFILE}
 
 # Login + build + push
-aws ecr get-login-password --region $REGION --profile $PROFILE | \
-  docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+aws ecr get-login-password --region ${REGION} --profile ${PROFILE} | \
+  docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
 
-docker build --no-cache --provenance=false --platform linux/amd64 -t $REPO:latest .
-docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
-docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
+docker build --no-cache --provenance=false --platform linux/amd64 -t ${REPO}:latest .
+docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest
+docker push ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest
 ```
 
 Copiar la URI resultante en `terraform.tfvars` como `lambda_ocr_image_uri`.
@@ -259,15 +263,15 @@ aws ecr create-repository --repository-name $REPO --region $REGION --profile $PR
 
 ```bash
 # Login al registry ECR — el flag --profile asegura autenticación en la cuenta correcta
-aws ecr get-login-password --region $REGION --profile $PROFILE | \
-  docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+aws ecr get-login-password --region ${REGION} --profile ${PROFILE} | \
+  docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
 
 # Construir la imagen para arquitectura amd64 (requerido por Lambda)
-docker build --no-cache --provenance=false --platform linux/amd64 -t $REPO:latest .
+docker build --no-cache --provenance=false --platform linux/amd64 -t ${REPO}:latest .
 
 # Etiquetar y hacer push al registry ECR
-docker tag $REPO:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
-docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO:latest
+docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest
+docker push ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest
 ```
 
 > ⚠️ **Multi-cuenta:** Omitir `--profile agro-stg` haría que Docker se autenticara con las credenciales por defecto del sistema, potencialmente subiendo la imagen a una cuenta de AWS diferente (ej. tu cuenta personal). El `profile` especificado en Terraform (`var.aws_profile = "agro-stg"`) y el perfil usado en la CLI **deben coincidir**.
