@@ -171,7 +171,7 @@ variable "ocr_gemini_secret_name" {
 variable "ocr_model_id" {
   description = "Gemini model identifier."
   type        = string
-  default     = "gemini-2.0-flash"
+  default     = "models/gemini-2.5-flash"
 }
 
 variable "ocr_shapefile_key" {

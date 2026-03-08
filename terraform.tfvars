@@ -41,7 +41,7 @@ downloader_table_metadata    = "metadata"
 # ---- Lambda 3: OCR/IA – environment variables ----
 # Credentials are managed exclusively via Secrets Manager (stgsecagromongoue1 / stgsecagrogeminiue1).
 ocr_gemini_secret_name         = "stgsecagrogeminiue1"
-ocr_model_id                   = "gemini-2.0-flash"
+ocr_model_id                   = "models/gemini-2.5-flash"
 ocr_shapefile_key              = "resource/shapefile/Provincial_INEI_2023.zip"
 ocr_mongo_secret_name          = "stgsecagromongoue1"
 ocr_mongo_db_name              = "agroalerta"
