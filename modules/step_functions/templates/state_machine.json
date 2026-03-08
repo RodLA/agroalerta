@@ -1,0 +1,95 @@
+{
+  "Comment": "AgroAlerta – Agroclimatic bulletin pipeline. Triggered every Sunday at 01:00 AM UTC.",
+  "StartAt": "ScrapeSenamhi",
+  "States": {
+    "ScrapeSenamhi": {
+      "Type": "Task",
+      "Resource": "${scraper_function_arn}",
+      "Comment": "Lambda 1: Scrapes SENAMHI portal and registers new PDF URLs in MongoDB.",
+      "Next": "CheckNewItems"
+    },
+    "CheckNewItems": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.new_items_found",
+          "NumericGreaterThan": 0,
+          "Next": "ProcessPDFs"
+        }
+      ],
+      "Default": "Finish"
+    },
+    "ProcessPDFs": {
+      "Type": "Map",
+      "Comment": "Iterates over every newly discovered PDF URL, downloading and processing sequentially.",
+      "ItemsPath": "$.items",
+      "MaxConcurrency": 1,
+      "Iterator": {
+        "StartAt": "DownloadAndSaveS3",
+        "States": {
+          "DownloadAndSaveS3": {
+            "Type": "Task",
+            "Resource": "${downloader_function_arn}",
+            "Comment": "Lambda 2: Downloads the PDF and stores it in S3.",
+            "Retry": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 2,
+                "BackoffRate": 2
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Next": "SkipAndContinue"
+              }
+            ],
+            "Next": "ProcessOCR"
+          },
+          "ProcessOCR": {
+            "Type": "Task",
+            "Resource": "${ocr_processor_function_arn}",
+            "Comment": "Lambda 3: Runs OCR + geospatial analysis + Gemini AI enrichment.",
+            "Retry": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 2,
+                "BackoffRate": 2
+              }
+            ],
+            "Catch": [
+              {
+                "ErrorEquals": ["States.ALL"],
+                "Next": "SkipAndContinue"
+              }
+            ],
+            "Next": "WaitForGeminiLimit"
+          },
+          "WaitForGeminiLimit": {
+            "Type": "Wait",
+            "Comment": "Pause to respect Gemini API rate limits.",
+            "Seconds": 15,
+            "Next": "IterationDone"
+          },
+          "SkipAndContinue": {
+            "Type": "Pass",
+            "Comment": "Catches any error and continues with the next PDF.",
+            "Next": "IterationDone"
+          },
+          "IterationDone": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "Next": "Finish"
+    },
+    "Finish": {
+      "Type": "Pass",
+      "Comment": "Pipeline completed successfully.",
+      "End": true
+    }
+  }
+}

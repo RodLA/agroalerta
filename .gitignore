@@ -1,0 +1,57 @@
+# =============================================================================
+# Terraform
+# =============================================================================
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform lockfile – keep it; un-comment to ignore
+# .terraform.lock.hcl
+
+# Terraform state files (use remote backend)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan output
+*.tfplan
+
+# Generated zip archives for Lambda deployments
+*.zip
+
+# Terraform vars files (may contain secrets)
+*.tfvars.json
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+pip-log.txt
+
+# =============================================================================
+# OS / IDE
+# =============================================================================
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
