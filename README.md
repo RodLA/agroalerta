@@ -126,24 +126,14 @@ agro-alerta/
 
 ### 1. Bootstrap del Backend
 
-Ejecutar una sola vez para crear el bucket de estado Terraform:
+Ejecutar una sola vez antes del primer `terraform init`. El script crea el bucket S3 para el estado remoto y activa el versionamiento:
 
 ```bash
-aws s3api create-bucket \
-  --bucket stgs3agroterraformstateue1 \
-  --region us-east-1
-
-aws s3api put-bucket-versioning \
-  --bucket stgs3agroterraformstateue1 \
-  --versioning-configuration Status=Enabled
-
-aws dynamodb create-table \
-  --table-name stgs3agroterraform-lock \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST \
-  --region us-east-1
+chmod +x scripts/bootstrap.sh
+./scripts/bootstrap.sh agro-stg   # pasa el nombre de tu perfil AWS
 ```
+
+Esto creará únicamente el bucket `stgs3agroterraformstateue1`. **No se requiere DynamoDB** — la gestión de concurrencia se centraliza en MongoDB.
 
 ### 2. Construir y Publicar la Imagen de Lambda 3 (OCR/IA)
 
