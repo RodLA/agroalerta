@@ -29,7 +29,7 @@ scraper_mongo_secret_name = "stgsecagromongoue1"
 scraper_mongo_db_name     = "agroalerta"
 scraper_table_metadata    = "metadata"
 # scraper_cultivos_objetivo = "papa,maíz,maiz,arroz,café,cafe,cacao"
-scraper_cultivos_objetivo = "cacao"
+scraper_cultivos_objetivo = "papa,maíz,maiz,arroz,café,cafe,cacao"
 scraper_months_to_fetch   = 2
 
 # ---- Lambda 2: Downloader – environment variables ----
