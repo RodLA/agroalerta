@@ -3,8 +3,10 @@ package com.utp.agroalerta;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 import java.util.TimeZone;
+import java.util.function.Supplier;
 
 @SpringBootApplication
 public class UtpComponentAgroalertaApiApplication {
@@ -15,8 +17,12 @@ public class UtpComponentAgroalertaApiApplication {
 
     @PostConstruct
     public void init() {
-        // Establece la zona horaria de Perú para toda la aplicación
         TimeZone.setDefault(TimeZone.getTimeZone("America/Lima"));
+    }
+
+    @Bean(name = "health")
+    public Supplier<String> health() {
+        return () -> "Ok";
     }
 
 }
