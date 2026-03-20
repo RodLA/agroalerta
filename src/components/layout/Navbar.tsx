@@ -18,7 +18,7 @@ export function Navbar() {
   const { isLocating, handleMyLocation } = useGeolocation()
 
   const handleSearchClick = () => {
-    if (pathname.startsWith('/alerta')) {
+    if (pathname !== '/') {
       router.push('/')
     }
   }
@@ -72,9 +72,9 @@ export function Navbar() {
               Mapa
             </Link>
 
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="gap-2"
               onClick={handleMyLocation}
               disabled={isLocating}
@@ -103,8 +103,8 @@ export function Navbar() {
               </Button>
             </Link>
 
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={handleMyLocation}
               disabled={isLocating}

@@ -8,7 +8,7 @@ interface AlertDetailMapProps {
 
 export function AlertDetailMap({ mapAlertData }: AlertDetailMapProps) {
   return (
-    <Card className="border-none shadow-xl shadow-slate-200/60 overflow-hidden group pt-0 gap-0">
+    <Card className="border-none shadow-xl shadow-slate-200/60 overflow-hidden group py-0 gap-0">
       <CardHeader className="p-4 bg-slate-100/80 border-b pt-4">
         <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-500">
           Mapa de la Alerta

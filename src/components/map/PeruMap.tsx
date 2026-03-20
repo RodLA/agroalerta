@@ -108,7 +108,7 @@ export default function PeruMap({ alerts }: PeruMapProps) {
   const defaultZoom = 5
 
   return (
-    <div className="h-full w-full rounded-xl overflow-hidden border shadow-inner bg-slate-100 z-0">
+    <div className="h-full w-full rounded-b-xl overflow-hidden border shadow-inner bg-slate-100 z-0">
       <style jsx global>{`
         .leaflet-popup-content-wrapper {
           padding: 0;

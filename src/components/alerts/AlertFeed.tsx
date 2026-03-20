@@ -55,7 +55,7 @@ export function AlertFeed({ initialData }: AlertFeedProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold tracking-tight">Resultados de la búsqueda</h2>
         <span className="text-sm text-muted-foreground">
-          {isLoading ? "..." : (pagination.totalElements || initialData.meta.totalElements)} alertas encontradas
+          {isLoading ? "..." : (isInitialized.current ? pagination.totalElements : initialData.meta.totalElements)} alertas encontradas
         </span>
       </div>
 
@@ -67,19 +67,19 @@ export function AlertFeed({ initialData }: AlertFeedProps) {
           ))
         ) : (
           // Actual Data
-          (alerts.length > 0 ? alerts : initialData.data).map((alert) => (
+          (isInitialized.current ? alerts : initialData.data).map((alert) => (
             <AlertCard key={alert.id} alert={alert} />
           ))
         )}
       </div>
 
-      {!isLoading && alerts.length === 0 && !initialData.data.length && (
+      {!isLoading && isInitialized.current && alerts.length === 0 && (
         <div className="text-center py-20 bg-white rounded-xl border border-dashed">
           <p className="text-muted-foreground">No se encontraron alertas con los filtros seleccionados.</p>
         </div>
       )}
 
-      {!isLoading && <Pagination />}
+      {!isLoading && (isInitialized.current ? alerts.length > 0 : initialData.data.length > 0) && <Pagination />}
     </section>
   )
 }
