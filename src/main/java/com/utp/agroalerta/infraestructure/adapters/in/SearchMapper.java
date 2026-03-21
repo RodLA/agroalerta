@@ -13,15 +13,15 @@ public class SearchMapper {
     public static SearchCriteria toDomain(Map<String, Object> query) {
         int page = getIntValue(query, "page").orElse(0);
         int size = getIntValue(query, "size").orElse(6);
-        LocalDate startDate = getLocalDateValue(query, "startDate").orElse(LocalDate.now());
-        LocalDate endDate = getLocalDateValue(query, "endDate").orElse(LocalDate.now().plusMonths(3L));
+        LocalDate startDate = getLocalDateValue(query, "start").orElse(LocalDate.now());
+        LocalDate endDate = getLocalDateValue(query, "end").orElse(LocalDate.now().plusMonths(2L));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
         return SearchCriteria.builder()
                 .page(page)
                 .size(size)
-                .startDate(startDate.format(formatter))
-                .endDate(endDate.format(formatter))
+                .start(startDate.format(formatter))
+                .end(endDate.format(formatter))
                 .department(getIntValue(query, "department").orElse(null))
                 .province(getIntValue(query, "province").orElse(null))
                 .risk(getStringValue(query, "risk"))
@@ -30,13 +30,13 @@ public class SearchMapper {
     }
 
     public static SearchCriteria toReport(Map<String, Object> query) {
-        LocalDate startDate = getLocalDateValue(query, "startDate").orElse(null);
-        LocalDate endDate = getLocalDateValue(query, "endDate").orElse(null);
+        LocalDate startDate = getLocalDateValue(query, "start").orElse(null);
+        LocalDate endDate = getLocalDateValue(query, "end").orElse(null);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
         return SearchCriteria.builder()
-                .startDate(Objects.isNull(startDate) ? null : startDate.format(formatter))
-                .endDate(Objects.isNull(endDate) ? null : endDate.format(formatter))
+                .start(Objects.isNull(startDate) ? null : startDate.format(formatter))
+                .end(Objects.isNull(endDate) ? null : endDate.format(formatter))
                 .department(getIntValue(query, "department").orElse(null))
                 .build();
     }

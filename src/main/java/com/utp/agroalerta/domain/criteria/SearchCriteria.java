@@ -7,8 +7,8 @@ import lombok.Getter;
 public class SearchCriteria {
     private int page;
     private int size;
-    private String startDate;
-    private String endDate;
+    private String start;
+    private String end;
     private Integer department;
     private Integer province;
     private String risk;

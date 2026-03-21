@@ -27,7 +27,7 @@ public class ReportMongoAdapter implements ReportRepositoryPort {
     @Override
     public Optional<Report> getReport(SearchCriteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
-                buildMatchStage(criteria.getStartDate(), criteria.getEndDate(), criteria.getDepartment()),
+                buildMatchStage(criteria.getStart(), criteria.getEnd(), criteria.getDepartment()),
                 buildFacetStage(criteria.getDepartment()),
                 buildProjectStage()
         );

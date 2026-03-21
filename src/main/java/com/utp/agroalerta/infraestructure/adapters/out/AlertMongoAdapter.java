@@ -33,8 +33,8 @@ public class AlertMongoAdapter implements AlertRepositoryPort {
     public Pagination<AlertInfo> getAlerts(SearchCriteria criteria) {
         Pageable pageable = Pageable.ofSize(criteria.getSize()).withPage(criteria.getPage());
         Page<AlertProjection> page = alertMongoRepository.getAlerts(
-                criteria.getStartDate(),
-                criteria.getEndDate(),
+                criteria.getStart(),
+                criteria.getEnd(),
                 criteria.getRisk(),
                 criteria.getEvent(),
                 criteria.getDepartment(),

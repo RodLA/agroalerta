@@ -18,6 +18,6 @@ public interface AlertMongoRepository extends MongoRepository<AlertDocument, Str
             "        { $or: [ { $expr: { $eq: [ '?5', 'null' ] } }, { 'province_ids': ?5 } ] }" +
             "    ]" +
             "}", sort = "{ 'risk_date' : 1 }")
-    Page<AlertProjection> getAlerts(String startDate, String endDate, String risk, String event, Integer departmentId, Integer provinceId, Pageable pageable);
+    Page<AlertProjection> getAlerts(String start, String end, String risk, String event, Integer departmentId, Integer provinceId, Pageable pageable);
 
 }
