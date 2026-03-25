@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AgroAlerta Web
 
-## Getting Started
+AgroAlerta Web es una plataforma interactiva diseñada para el monitoreo y visualización de alertas agrícolas en el territorio peruano. La aplicación permite a los usuarios visualizar eventos críticos, filtrar información por regiones y provincias, y acceder a reportes detallados sobre riesgos agrícolas.
 
-First, run the development server:
+## 📂 Estructura del Proyecto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+El proyecto sigue la arquitectura de **Next.js App Router**:
+
+```text
+utp-component-agroalerta-web/
+├── public/                 # Archivos estáticos
+├── src/
+│   ├── actions/            # Server Actions para llamadas a la API
+│   ├── app/                # Rutas y layouts principales
+│   ├── components/         # Componentes React (UI, Mapa, etc.)
+│   ├── hooks/              # Hooks personalizados (Geolocalización, etc.)
+│   ├── lib/                # Utilidades y configuración de librerías
+│   ├── schemas/            # Esquemas de validación (Zod)
+│   ├── store/              # Gestión de estado (Zustand)
+│   └── types/              # Definiciones de tipos TypeScript
+├── .env.example            # Ejemplo de variables de entorno
+├── components.json         # Configuración de shadcn/ui
+├── next.config.ts          # Configuración de Next.js
+├── package.json            # Dependencias y scripts
+└── tsconfig.json           # Configuración de TypeScript
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Dependencias del Proyecto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Las principales tecnologías utilizadas en este proyecto son:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js 15+](https://nextjs.org/)
+- **Interfaz**: [React 19](https://react.dev/)
+- **Estilos**: [Tailwind CSS](https://tailwindcss.com/)
+- **Componentes UI**: [Radix UI](https://www.radix-ui.com/), [Lucide React](https://lucide.dev/), [Sonner](https://sonner.steventey.com/)
+- **Mapas**: [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
+- **Gestión de Estado**: [Zustand](https://docs.pmnd.rs/zustand/)
+- **Validación**: [Zod](https://zod.dev/) & [React Hook Form](https://react-hook-form.com/)
 
-## Learn More
+## 🔑 Variables de Entorno
 
-To learn more about Next.js, take a look at the following resources:
+Para que la aplicación funcione correctamente, es necesario configurar las siguientes variables de entorno:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Descripción | Valor Ejemplo |
+|----------|-------------|---------------|
+| `NEXT_PUBLIC_API_URL` | URL base del servicio API (Spring Cloud Function) | `http://localhost:8080` |
+| `NEXT_PUBLIC_NOMINATIM_URL` | URL para el servicio de geocodificación inversa | `https://nominatim.openstreetmap.org` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+El archivo `.env.example` contiene estas claves. Se recomienda crear un archivo `.env.local` para el desarrollo local.
 
-## Deploy on Vercel
+## 🚀 Ejecución Local
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📋 Prerrequisitos
+- Tener instalado [Node.js](https://nodejs.org/) (versión 18 o superior).
+- El servicio backend (**NEXT_PUBLIC_API_URL**) debe estar en ejecución para que la aplicación pueda consumir los datos.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 🛠️ Pasos
+1. Clonar el repositorio.
+2. Instalar las dependencias:
+   ```bash
+   npm install
+   # o
+   pnpm install
+   # o
+   yarn install
+   # o
+   bun install
+   ```
+3. Configurar las variables de entorno en un archivo `.env.local`.
+4. Iniciar el servidor de desarrollo:
+   ```bash
+   npm run dev
+   # o pnpm dev / yarn dev / bun dev
+   ```
+5. Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
+
+## ☁️ Guía de Despliegue (Vercel)
+
+El despliegue en Vercel es sencillo siguiendo estos pasos:
+
+1. **Importar el Proyecto**:
+   - Ve a [Vercel](https://vercel.com/) y selecciona "New Project".
+   - Conecta tu repositorio de GitHub o importa el proyecto localmente usando la CLI de Vercel.
+
+2. **Configurar Variables de Entorno**:
+   - Durante el proceso de configuración en Vercel, ve a la sección "Environment Variables".
+   - Agrega la variable `NEXT_PUBLIC_API_URL` con la URL de tu API en producción.
+   - Agrega `NEXT_PUBLIC_NOMINATIM_URL` (opcional, si es diferente al valor por defecto).
+
+> [!IMPORTANT]
+> Es **indispensable** configurar correctamente `NEXT_PUBLIC_API_URL`. Sin esta variable, la aplicación no tendrá acceso a la data y presentará errores de carga.
+
+3. **Desplegar**:
+   - Haz clic en "Deploy". Vercel detectará automáticamente que es un proyecto de Next.js y realizará el build.
+
+## 📑 Resumen del Orden de Operaciones
+
+1. Asegurar que el **Backend (API)** esté disponible.
+2. Configurar las **Variables de Entorno**.
+3. Instalar dependencias con `npm install` (o tu gestor preferido).
+4. Ejecutar el build o el entorno de desarrollo.
+5. Verificar la conexión con el mapa y la carga de departamentos.
