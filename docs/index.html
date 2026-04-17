@@ -46,6 +46,11 @@
         <a href="#step4" class="nav-link"><i class="fas fa-key"></i> 4. Secretos</a>
       </div>
       <div class="nav-group">
+        <span class="nav-label">Servicios y Usuario</span>
+        <a href="#api" class="nav-link"><i class="fas fa-cloud-bolt"></i> API REST (Lambda)</a>
+        <a href="#webapp" class="nav-link"><i class="fas fa-desktop"></i> Aplicación Web</a>
+      </div>
+      <div class="nav-group">
         <span class="nav-label">Referencia</span>
         <a href="#lambdas" class="nav-link"><i class="fas fa-bolt"></i> Variables de entorno</a>
         <a href="#modules" class="nav-link"><i class="fas fa-cube"></i> Módulos Terraform</a>
@@ -80,10 +85,12 @@
           <span class="badge badge-tf">Terraform</span>
           <span class="badge badge-docker">Docker</span>
           <span class="badge badge-mongo">MongoDB</span>
+          <span class="badge badge-java">Spring Boot</span>
+          <span class="badge badge-next">Next.js</span>
           <span class="badge badge-gemini">Gemini AI</span>
         </div>
         <h1 class="hero-title">AgroAlerta</h1>
-        <p class="hero-subtitle">Plataforma serverless de monitoreo agroclimático para el Perú. Procesa boletines de SENAMHI, extrae datos con OCR e inteligencia artificial, y los almacena estructurados en MongoDB Atlas.</p>
+        <p class="hero-subtitle">Plataforma serverless de monitoreo agroclimático para el Perú. Procesa boletines de SENAMHI con IA y expone los datos mediante una API de alto rendimiento y un dashboard interactivo.</p>
         <div class="hero-actions">
           <a href="#step1" class="btn btn-primary">Guía de despliegue</a>
           <a href="#architecture" class="btn btn-secondary">Ver arquitectura</a>
@@ -144,18 +151,18 @@
           </div>
           <div class="card">
             <div class="card-icon"><i class="fas fa-code-branch"></i></div>
-            <h3>Infrastructure as Code</h3>
-            <p>Toda la infraestructura está definida en Terraform. Reproducible y versionada en Git.</p>
+            <h3>Hexagonal API</h3>
+            <p>Backend robusto con Spring Cloud Function, diseñado para escalabilidad y mantenibilidad.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-desktop"></i></div>
+            <h3>Next.js 15 Web</h3>
+            <p>Panel interactivo moderno con mapas en tiempo real y visualización de riesgos agrícolas.</p>
           </div>
           <div class="card">
             <div class="card-icon"><i class="fas fa-robot"></i></div>
             <h3>IA integrada</h3>
             <p>Gemini 2.5 Flash extrae, interpreta y estructura datos climáticos desde documentos PDF.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
-            <h3>Seguro por diseño</h3>
-            <p>IAM con mínimo privilegio. Credenciales en Secrets Manager, nunca en código.</p>
           </div>
         </div>
       </section>
@@ -228,6 +235,18 @@
               <strong>MongoDB Atlas</strong>
               <span>Resultados estructurados</span>
             </div>
+            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="arch-store">
+              <i class="fas fa-cloud-bolt"></i>
+              <strong>API Lambda</strong>
+              <span>Spring Cloud Function</span>
+            </div>
+            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="arch-store">
+              <i class="fas fa-desktop"></i>
+              <strong>WebApp</strong>
+              <span>Next.js Dashboard</span>
+            </div>
             <div class="arch-store">
               <i class="fas fa-lock"></i>
               <strong>Secrets Manager</strong>
@@ -250,7 +269,9 @@
               <tr><td>Almacenamiento</td><td>Amazon S3</td><td>PDFs descargados, shapefiles, lambda layer</td></tr>
               <tr><td>Base de datos</td><td>MongoDB Atlas</td><td>Documentos procesados, recomendaciones, catálogos</td></tr>
               <tr><td>IA generativa</td><td>Gemini 2.5 Flash</td><td>Extracción estructurada de datos climáticos</td></tr>
-              <tr><td>Contenedores</td><td>Amazon ECR</td><td>Imagen Docker de la Lambda OCR/IA</td></tr>
+              <tr><td>API Backend</td><td>Java 17 / Spring Cloud Function</td><td>Microservicio serverless para exposición de datos</td></tr>
+              <tr><td>Web Frontend</td><td>Next.js 15 / Tailwind CSS</td><td>Aplicación web moderna y responsive</td></tr>
+              <tr><td>Mapas</td><td>Leaflet / OpenStreetMap</td><td>Visualización geográfica de alertas agrícolas</td></tr>
               <tr><td>Credenciales</td><td>AWS Secrets Manager</td><td>MongoDB credentials + Gemini API Key</td></tr>
               <tr><td>IaC</td><td>Terraform</td><td>Infraestructura completa declarada y versionada</td></tr>
               <tr><td>Estado Terraform</td><td>S3 + perfil nombrado</td><td>Remote state con cifrado, sin DynamoDB</td></tr>
@@ -303,8 +324,22 @@
           <div class="check-item">
             <i class="fas fa-square-check"></i>
             <div>
+              <strong>Entorno de Desarrollo API</strong>
+              <p>JDK 17 y Maven 3.8+ instalados para compilar los servicios Java.</p>
+            </div>
+          </div>
+          <div class="check-item">
+            <i class="fas fa-square-check"></i>
+            <div>
+              <strong>Entorno de Desarrollo Web</strong>
+              <p>Node.js 18+ y un gestor de paquetes (npm/pnpm) para la aplicación Next.js.</p>
+            </div>
+          </div>
+          <div class="check-item">
+            <i class="fas fa-square-check"></i>
+            <div>
               <strong>Shapefile <code>Provincial_INEI_2023.zip</code></strong>
-              <p>Colocar en <code>resource/Provincial_INEI_2023.zip</code> dentro del repo.</p>
+              <p>Colocar en <code>resource/Provincial_INEI_2023.zip</code> dentro del repo de ingesta.</p>
             </div>
           </div>
         </div>
@@ -432,6 +467,84 @@ terraform apply tfplan</code></pre>
         <p>Una vez actualizados, el pipeline está listo para ejecutarse el próximo domingo.</p>
       </section>
 
+      <!-- API REST Section -->
+      <section id="api" class="section">
+        <h2 class="section-title">API REST (Spring Cloud Function)</h2>
+        <p>La API de AgroAlerta actúa como el puente entre los datos almacenados en MongoDB y la aplicación web. Está diseñada siguiendo una <strong>Arquitectura Hexagonal</strong> para separar la lógica de negocio de los detalles de implementación.</p>
+
+        <div class="api-grid">
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-layer-group"></i>
+              <span>Arquitectura del Proyecto</span>
+            </div>
+            <ul class="api-list">
+              <li><strong>Domain:</strong> Núcleo del negocio (Entidades y Puertos).</li>
+              <li><strong>Application:</strong> Servicios y casos de uso.</li>
+              <li><strong>Infrastructure:</strong> Adaptadores de MongoDB y Web Functions.</li>
+            </ul>
+          </div>
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-rocket"></i>
+              <span>Configuración AWS Lambda</span>
+            </div>
+            <p>Para el despliegue se utiliza un <strong>AWS Handler</strong> específico:</p>
+            <code class="block-code">org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest</code>
+            <p>Es indispensable incluir el header <code>spring.cloud.function.definition</code> en las peticiones para seleccionar el servicio (ej. <code>getSummary</code>).</p>
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Endpoints Principales</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Bean / Función</th><th>Método</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td><code>getSummary</code></td><td><span class="badge-get">GET</span></td><td>Resumen estadístico global de riesgos.</td></tr>
+              <tr><td><code>searchAlerts</code></td><td><span class="badge-get">GET</span></td><td>Búsqueda paginada con filtros (región, riesgo, fecha).</td></tr>
+              <tr><td><code>getReport</code></td><td><span class="badge-get">GET</span></td><td>Generación de datos para reportes descargables.</td></tr>
+              <tr><td><code>findAlertById</code></td><td><span class="badge-post">POST</span></td><td>Detalle técnico de una alerta específica.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Web App Section -->
+      <section id="webapp" class="section">
+        <h2 class="section-title">Aplicación Web (Next.js 15)</h2>
+        <p>El dashboard interactivo permite la visualización geográfica y el análisis de las alertas procesadas. Utiliza <strong>Server Actions</strong> para una comunicación eficiente con la API.</p>
+
+        <div class="web-mockup-container">
+          <div class="web-mockup">
+            <div class="mockup-sidebar"></div>
+            <div class="mockup-content">
+              <div class="mockup-header"></div>
+              <div class="mockup-map">
+                <i class="fas fa-map-location-dot"></i>
+                <span>Mapa de Alertas Interactivo</span>
+              </div>
+              <div class="mockup-cards">
+                <div class="m-card"></div>
+                <div class="m-card"></div>
+                <div class="m-card"></div>
+              </div>
+            </div>
+          </div>
+          <div class="web-info">
+            <h3>Tecnologías Core</h3>
+            <ul class="tech-list-simple">
+              <li><i class="fab fa-react"></i> React 19 + TypeScript</li>
+              <li><i class="fas fa-bolt"></i> Zustand (Estado global)</li>
+              <li><i class="fas fa-wind"></i> Tailwind CSS + Shadcn/ui</li>
+              <li><i class="fas fa-map"></i> Leaflet / React Leaflet</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout callout-info" style="margin-top: 24px;">
+          <strong>Despliegue en Vercel:</strong> Solo requiere conectar el repositorio y configurar <code>NEXT_PUBLIC_API_URL</code> con la URL de la función Lambda.
+        </div>
+      </section>
+
       <!-- Lambda env vars -->
       <section id="lambdas" class="section">
         <h2 class="section-title">Variables de entorno por Lambda</h2>
@@ -485,6 +598,28 @@ terraform apply tfplan</code></pre>
               <tr><td><code>MONGO_COLLECTION_LOCATIONS</code></td><td><code>terraform.tfvars</code></td><td>Catálogo de ubicaciones</td></tr>
               <tr><td><code>MONGO_COLLECTION_SOURCES</code></td><td><code>terraform.tfvars</code></td><td>Fuentes oficiales</td></tr>
               <tr><td><code>MONGO_COLLECTION_DOMAINS</code></td><td><code>terraform.tfvars</code></td><td>Dominios SENAMHI</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subsection-title">API REST – Backend</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Variable</th><th>Descripción</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>MONGO_URI</code></td><td>Cadena de conexión de MongoDB Atlas</td><td>Acceso a datos estructurados</td></tr>
+              <tr><td><code>CORS_ORIGIN</code></td><td>URL de la Aplicación Web</td><td>Seguridad y acceso cross-origin</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subsection-title">Aplicación Web – Frontend</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Variable</th><th>Descripción</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td>URL de la Lambda (API)</td><td>Consumo de servicios</td></tr>
+              <tr><td><code>NEXT_PUBLIC_NOMINATIM_URL</code></td><td>URL de Geocodificación</td><td>Búsqueda de direcciones en mapa</td></tr>
             </tbody>
           </table>
         </div>
