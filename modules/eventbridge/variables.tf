@@ -16,7 +16,7 @@ variable "region_short" {
 variable "schedule_expression" {
   description = "EventBridge schedule expression (cron or rate)."
   type        = string
-  default     = "cron(0 1 ? * SUN *)"
+  default     = "cron(0 1 * * ? *)"
 }
 
 variable "step_function_arn" {

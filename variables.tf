@@ -251,5 +251,5 @@ variable "lambda_ocr_image_uri" {
 variable "eventbridge_schedule" {
   description = "EventBridge cron expression for the pipeline trigger."
   type        = string
-  default     = "cron(0 1 ? * SUN *)"
+  default     = "cron(0 1 * * ? *)"
 }

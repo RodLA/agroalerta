@@ -59,4 +59,4 @@ ocr_collection_domains         = "domains"
 lambda_ocr_image_uri = "010594764766.dkr.ecr.us-east-1.amazonaws.com/stgecragroocrprocessorue1:latest"
 
 # ---- EventBridge ----
-eventbridge_schedule = "cron(0 1 ? * SUN *)"
+eventbridge_schedule = "cron(0 1 * * ? *)"

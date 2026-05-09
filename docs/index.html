@@ -101,7 +101,7 @@
           <div class="hd-node hd-top">
             <i class="fas fa-calendar-check"></i>
             <span>EventBridge</span>
-            <small>Cada domingo</small>
+            <small>Cada día</small>
           </div>
           <div class="hd-arrow-down"></div>
           <div class="hd-node hd-mid">
@@ -140,7 +140,7 @@
       <!-- Overview -->
       <section id="overview" class="section">
         <h2 class="section-title">Visión general</h2>
-        <p>AgroAlerta automatiza la recolección y análisis de boletines de riesgo agroclimático publicados por SENAMHI (Servicio Nacional de Meteorología e Hidrología del Perú). El sistema funciona de forma completamente autónoma: se activa cada domingo, descarga los documentos, los procesa con OCR y extrae información estructurada usando Gemini AI.</p>
+        <p>AgroAlerta automatiza la recolección y análisis de boletines de riesgo agroclimático publicados por SENAMHI (Servicio Nacional de Meteorología e Hidrología del Perú). El sistema funciona de forma completamente autónoma: se activa cada día, descarga los documentos, los procesa con OCR y extrae información estructurada usando Gemini AI.</p>
         <p>Toda la infraestructura se gestiona con Terraform. No hay servidores que mantener — solo funciones Lambda, un orquestador con Step Functions y almacenamiento en S3 y MongoDB Atlas.</p>
 
         <div class="cards-grid">
@@ -170,14 +170,14 @@
       <!-- Architecture -->
       <section id="architecture" class="section">
         <h2 class="section-title">Arquitectura del sistema</h2>
-        <p>El pipeline se ejecuta semanalmente. Cada etapa es una Lambda independiente orquestada por Step Functions, con retroalimentación de errores y reintentos automáticos.</p>
+        <p>El pipeline se ejecuta diariamente. Cada etapa es una Lambda independiente orquestada por Step Functions, con retroalimentación de errores y reintentos automáticos.</p>
 
         <div class="arch-flow">
           <div class="arch-node trigger">
             <div class="arch-icon"><i class="fas fa-calendar-check"></i></div>
             <div class="arch-info">
               <strong>EventBridge</strong>
-              <span>cron(0 1 ? * SUN *)</span>
+              <span>cron(0 1 * * ? *)</span>
             </div>
           </div>
           <div class="arch-arrow"><i class="fas fa-arrow-down"></i></div>
@@ -265,7 +265,7 @@
             <tbody>
               <tr><td>Orquestación</td><td>AWS Step Functions</td><td>Pipeline secuencial con reintentos y manejo de errores</td></tr>
               <tr><td>Cómputo</td><td>AWS Lambda</td><td>Scraper, Downloader (zip); OCR/IA (container)</td></tr>
-              <tr><td>Scheduler</td><td>Amazon EventBridge</td><td>Trigger semanal cada domingo</td></tr>
+              <tr><td>Scheduler</td><td>Amazon EventBridge</td><td>Trigger diario a la 01:00 AM UTC</td></tr>
               <tr><td>Almacenamiento</td><td>Amazon S3</td><td>PDFs descargados, shapefiles, lambda layer</td></tr>
               <tr><td>Base de datos</td><td>MongoDB Atlas</td><td>Documentos procesados, recomendaciones, catálogos</td></tr>
               <tr><td>IA generativa</td><td>Gemini 2.5 Flash</td><td>Extracción estructurada de datos climáticos</td></tr>
@@ -464,7 +464,7 @@ terraform apply tfplan</code></pre>
           </div>
         </div>
 
-        <p>Una vez actualizados, el pipeline está listo para ejecutarse el próximo domingo.</p>
+        <p>Una vez actualizados, el pipeline está listo para ejecutarse al día siguiente a la 01:00 AM UTC.</p>
       </section>
 
       <!-- API REST Section -->
@@ -652,7 +652,7 @@ terraform apply tfplan</code></pre>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-calendar-check"></i></div>
             <strong>eventbridge</strong>
-            <p>Regla con expresión cron configurable. Trigger semanal hacia Step Functions con rol de invocación dedicado.</p>
+            <p>Regla con expresión cron configurable. Trigger diario hacia Step Functions con rol de invocación dedicado.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-lock"></i></div>

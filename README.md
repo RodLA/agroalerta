@@ -8,7 +8,7 @@
 ## 📐 Arquitectura
 
 ```
-EventBridge (cron dominical)
+EventBridge (cron diario)
         │
         ▼
 ┌───────────────────────────────────────────────┐
@@ -40,7 +40,7 @@ EventBridge (cron dominical)
 ```
 agro-alerta/
 ├── modules/
-│   ├── eventbridge/        # Regla cron semanal → Step Functions
+│   ├── eventbridge/        # Regla cron diaria → Step Functions
 │   ├── iam_roles/          # Roles de mínimo privilegio para cada recurso
 │   ├── lambda/             # Las 3 funciones Lambda
 │   ├── s3/                 # Bucket de recursos + upload de scripts
@@ -211,10 +211,10 @@ terraform apply tfplan
 
 ## 🗓️ Trigger Automático
 
-La regla EventBridge ejecuta el pipeline **todos los domingos a la 01:00 AM UTC**:
+La regla EventBridge ejecuta el pipeline **todos los días a la 01:00 AM UTC**:
 
 ```
-cron(0 1 ? * SUN *)
+cron(0 1 * * ? *)
 ```
 
 Para cambiar la frecuencia, editar `eventbridge_schedule` en `terraform.tfvars`.
@@ -368,7 +368,7 @@ Hacer clic en **"Retrieve secret value"** → **"Edit"** y reemplazar con tu API
 │  ► Secrets Manager → stgsecagromongoue1 → credenciales real │
 │  ► Secrets Manager → stgsecagrogeminiue1 → API Key real     │
 │                                                             │
-│  ✅ Pipeline listo para ejecutarse el próximo domingo       │
+│  ✅ Pipeline listo para ejecución diaria a la 01:00 AM UTC│
 └─────────────────────────────────────────────────────────────┘
 ```
 
