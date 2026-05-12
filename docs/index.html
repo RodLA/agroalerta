@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AgroAlerta – Manual de Despliegue</title>
-  <meta name="description" content="Manual técnico de despliegue de la infraestructura serverless AgroAlerta en AWS con Terraform." />
+  <meta name="description"
+    content="Manual técnico de despliegue de la infraestructura serverless AgroAlerta en AWS con Terraform." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
 
   <!-- Mobile overlay -->
@@ -44,10 +49,13 @@
         <a href="#step2" class="nav-link"><i class="fab fa-docker"></i> 2. ECR + Docker</a>
         <a href="#step3" class="nav-link"><i class="fas fa-rocket"></i> 3. Terraform Apply</a>
         <a href="#step4" class="nav-link"><i class="fas fa-key"></i> 4. Secretos</a>
+        <a href="#step5" class="nav-link"><i class="fas fa-database"></i> 5. Setup DB</a>
+        <a href="#step6" class="nav-link"><i class="fas fa-network-wired"></i> 6. API Gateway</a>
       </div>
       <div class="nav-group">
         <span class="nav-label">Servicios y Usuario</span>
         <a href="#api" class="nav-link"><i class="fas fa-cloud-bolt"></i> API REST (Lambda)</a>
+        <a href="#database" class="nav-link"><i class="fas fa-leaf"></i> Estructura de Datos</a>
         <a href="#webapp" class="nav-link"><i class="fas fa-desktop"></i> Aplicación Web</a>
       </div>
       <div class="nav-group">
@@ -90,7 +98,8 @@
           <span class="badge badge-gemini">Gemini AI</span>
         </div>
         <h1 class="hero-title">AgroAlerta</h1>
-        <p class="hero-subtitle">Plataforma serverless de monitoreo agroclimático para el Perú. Procesa boletines de SENAMHI con IA y expone los datos mediante una API de alto rendimiento y un dashboard interactivo.</p>
+        <p class="hero-subtitle">Plataforma serverless de monitoreo agroclimático para el Perú. Procesa boletines de
+          SENAMHI con IA y expone los datos mediante una API de alto rendimiento y un dashboard interactivo.</p>
         <div class="hero-actions">
           <a href="#step1" class="btn btn-primary">Guía de despliegue</a>
           <a href="#architecture" class="btn btn-secondary">Ver arquitectura</a>
@@ -140,8 +149,14 @@
       <!-- Overview -->
       <section id="overview" class="section">
         <h2 class="section-title">Visión general</h2>
-        <p>AgroAlerta automatiza la recolección y análisis de boletines de riesgo agroclimático publicados por SENAMHI (Servicio Nacional de Meteorología e Hidrología del Perú). El sistema funciona de forma completamente autónoma: se activa cada día, descarga los documentos, los procesa con OCR y extrae información estructurada usando Gemini AI.</p>
-        <p>Toda la infraestructura se gestiona con Terraform. No hay servidores que mantener — solo funciones Lambda, un orquestador con Step Functions y almacenamiento en S3 y MongoDB Atlas.</p>
+        <p>AgroAlerta automatiza la recolección y análisis de boletines de riesgo agroclimático publicados por SENAMHI
+          (Servicio Nacional de Meteorología e Hidrología del Perú). El sistema funciona de forma completamente
+          autónoma: se activa cada día, descarga los documentos, los procesa con OCR y extrae información estructurada
+          usando Gemini AI.</p>
+        <p>Toda la infraestructura se gestiona con Terraform siguiendo un modelo serverless. La API REST, construida con
+          <strong>Spring Cloud Function</strong> y <strong>Arquitectura Hexagonal</strong>, garantiza una separación
+          clara entre las reglas de negocio y los adaptadores de infraestructura (AWS Lambda, MongoDB Atlas),
+          facilitando la escalabilidad y mantenibilidad.</p>
 
         <div class="cards-grid">
           <div class="card">
@@ -170,7 +185,8 @@
       <!-- Architecture -->
       <section id="architecture" class="section">
         <h2 class="section-title">Arquitectura del sistema</h2>
-        <p>El pipeline se ejecuta diariamente. Cada etapa es una Lambda independiente orquestada por Step Functions, con retroalimentación de errores y reintentos automáticos.</p>
+        <p>El pipeline se ejecuta diariamente. Cada etapa es una Lambda independiente orquestada por Step Functions, con
+          retroalimentación de errores y reintentos automáticos.</p>
 
         <div class="arch-flow">
           <div class="arch-node trigger">
@@ -193,7 +209,8 @@
               <div class="step-num">01</div>
               <div class="arch-icon"><i class="fas fa-spider"></i></div>
               <strong>Lambda – Scraper</strong>
-              <p>Navega el portal de SENAMHI y extrae los enlaces a los boletines PDF publicados en los últimos meses. Guarda el registro en MongoDB.</p>
+              <p>Navega el portal de SENAMHI y extrae los enlaces a los boletines PDF publicados en los últimos meses.
+                Guarda el registro en MongoDB.</p>
               <div class="step-tags">
                 <span class="tag">Python 3.11</span>
                 <span class="tag">ZIP deploy</span>
@@ -204,7 +221,8 @@
               <div class="step-num">02</div>
               <div class="arch-icon"><i class="fas fa-file-arrow-down"></i></div>
               <strong>Lambda – Downloader</strong>
-              <p>Descarga cada PDF desde SENAMHI y lo sube a S3. Actualiza el estado del documento en MongoDB para evitar descargas duplicadas.</p>
+              <p>Descarga cada PDF desde SENAMHI y lo sube a S3. Actualiza el estado del documento en MongoDB para
+                evitar descargas duplicadas.</p>
               <div class="step-tags">
                 <span class="tag">Python 3.11</span>
                 <span class="tag">ZIP deploy</span>
@@ -215,7 +233,8 @@
               <div class="step-num">03</div>
               <div class="arch-icon"><i class="fas fa-brain"></i></div>
               <strong>Lambda – OCR + IA</strong>
-              <p>Convierte el PDF a imagen, georreferencia el mapa de riesgo usando puntos de control fijos y envía las imágenes a Gemini para extracción estructurada de datos.</p>
+              <p>Convierte el PDF a imagen, georreferencia el mapa de riesgo usando puntos de control fijos y envía las
+                imágenes a Gemini para extracción estructurada de datos.</p>
               <div class="step-tags">
                 <span class="tag">Python 3.9</span>
                 <span class="tag">Container ECR</span>
@@ -233,7 +252,13 @@
             <div class="arch-store">
               <i class="fas fa-database"></i>
               <strong>MongoDB Atlas</strong>
-              <span>Resultados estructurados</span>
+              <span>Estructura de Datos e Índices</span>
+            </div>
+            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="arch-store">
+              <i class="fas fa-network-wired"></i>
+              <strong>API Gateway</strong>
+              <span>Proxy, CORS y Usage Plan</span>
             </div>
             <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
             <div class="arch-store">
@@ -245,7 +270,7 @@
             <div class="arch-store">
               <i class="fas fa-desktop"></i>
               <strong>WebApp</strong>
-              <span>Next.js Dashboard</span>
+              <span>Next.js 15 (Dashboard)</span>
             </div>
             <div class="arch-store">
               <i class="fas fa-lock"></i>
@@ -261,20 +286,79 @@
         <h2 class="section-title">Stack técnico</h2>
         <div class="table-wrap">
           <table class="tech-table">
-            <thead><tr><th>Capa</th><th>Tecnología</th><th>Uso</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Capa</th>
+                <th>Tecnología</th>
+                <th>Uso</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>Orquestación</td><td>AWS Step Functions</td><td>Pipeline secuencial con reintentos y manejo de errores</td></tr>
-              <tr><td>Cómputo</td><td>AWS Lambda</td><td>Scraper, Downloader (zip); OCR/IA (container)</td></tr>
-              <tr><td>Scheduler</td><td>Amazon EventBridge</td><td>Trigger diario a la 01:00 AM UTC</td></tr>
-              <tr><td>Almacenamiento</td><td>Amazon S3</td><td>PDFs descargados, shapefiles, lambda layer</td></tr>
-              <tr><td>Base de datos</td><td>MongoDB Atlas</td><td>Documentos procesados, recomendaciones, catálogos</td></tr>
-              <tr><td>IA generativa</td><td>Gemini 2.5 Flash</td><td>Extracción estructurada de datos climáticos</td></tr>
-              <tr><td>API Backend</td><td>Java 17 / Spring Cloud Function</td><td>Microservicio serverless para exposición de datos</td></tr>
-              <tr><td>Web Frontend</td><td>Next.js 15 / Tailwind CSS</td><td>Aplicación web moderna y responsive</td></tr>
-              <tr><td>Mapas</td><td>Leaflet / OpenStreetMap</td><td>Visualización geográfica de alertas agrícolas</td></tr>
-              <tr><td>Credenciales</td><td>AWS Secrets Manager</td><td>MongoDB credentials + Gemini API Key</td></tr>
-              <tr><td>IaC</td><td>Terraform</td><td>Infraestructura completa declarada y versionada</td></tr>
-              <tr><td>Estado Terraform</td><td>S3 + perfil nombrado</td><td>Remote state con cifrado, sin DynamoDB</td></tr>
+              <tr>
+                <td>Orquestación</td>
+                <td>AWS Step Functions</td>
+                <td>Pipeline secuencial con reintentos y manejo de errores</td>
+              </tr>
+              <tr>
+                <td>Exposición API</td>
+                <td>Amazon API Gateway</td>
+                <td>REST API con proxy /{proxy+}, CORS y Usage Plans</td>
+              </tr>
+              <tr>
+                <td>Cómputo</td>
+                <td>AWS Lambda</td>
+                <td>Scraper, Downloader (zip); OCR/IA (container)</td>
+              </tr>
+              <tr>
+                <td>Scheduler</td>
+                <td>Amazon EventBridge</td>
+                <td>Trigger diario a la 01:00 AM UTC</td>
+              </tr>
+              <tr>
+                <td>Almacenamiento</td>
+                <td>Amazon S3</td>
+                <td>PDFs descargados, shapefiles, lambda layer</td>
+              </tr>
+              <tr>
+                <td>Base de datos</td>
+                <td>MongoDB Atlas</td>
+                <td>Estructura NoSQL con índices de alto rendimiento</td>
+              </tr>
+              <tr>
+                <td>IA generativa</td>
+                <td>Gemini 2.5 Flash</td>
+                <td>Extracción estructurada de datos climáticos</td>
+              </tr>
+              <tr>
+                <td>API Backend</td>
+                <td>Java 17 / Spring Cloud Function</td>
+                <td>Microservicio con Arquitectura Hexagonal</td>
+              </tr>
+              <tr>
+                <td>Web Frontend</td>
+                <td>Next.js 15 / Tailwind CSS</td>
+                <td>Aplicación web moderna y responsive</td>
+              </tr>
+              <tr>
+                <td>Mapas</td>
+                <td>Leaflet / OpenStreetMap</td>
+                <td>Visualización geográfica de alertas agrícolas</td>
+              </tr>
+              <tr>
+                <td>Credenciales</td>
+                <td>AWS Secrets Manager</td>
+                <td>MongoDB credentials + Gemini API Key</td>
+              </tr>
+              <tr>
+                <td>IaC</td>
+                <td>Terraform</td>
+                <td>Infraestructura completa declarada y versionada</td>
+              </tr>
+              <tr>
+                <td>Estado Terraform</td>
+                <td>S3 + perfil nombrado</td>
+                <td>Remote state con cifrado, sin DynamoDB</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -311,7 +395,8 @@
             <i class="fas fa-square-check"></i>
             <div>
               <strong>Cuenta MongoDB Atlas con un cluster activo</strong>
-              <p>Necesitas el string de conexión, usuario y contraseña listos para el paso 4.</p>
+              <p>Necesitas el string de conexión, usuario y contraseña. Usa <strong>MongoDB Compass</strong> para la
+                inicialización.</p>
             </div>
           </div>
           <div class="check-item">
@@ -325,7 +410,7 @@
             <i class="fas fa-square-check"></i>
             <div>
               <strong>Entorno de Desarrollo API</strong>
-              <p>JDK 17 y Maven 3.8+ instalados para compilar los servicios Java.</p>
+              <p>JDK 17 y Maven 3.8+ instalados. El proyecto genera un JAR con perfil <code>-aws</code> optimizado.</p>
             </div>
           </div>
           <div class="check-item">
@@ -333,6 +418,14 @@
             <div>
               <strong>Entorno de Desarrollo Web</strong>
               <p>Node.js 18+ y un gestor de paquetes (npm/pnpm) para la aplicación Next.js.</p>
+            </div>
+          </div>
+          <div class="check-item">
+            <i class="fas fa-square-check"></i>
+            <div>
+              <strong>Configuración e Inicialización de Base de Datos</strong>
+              <p>Clúster en MongoDB Atlas listo y ejecución del script <code>setup.js</code> para aprovisionar
+                colecciones e índices. (Ver Paso 5).</p>
             </div>
           </div>
           <div class="check-item">
@@ -351,10 +444,12 @@
           <div class="step-badge">Paso 1</div>
           <h2 class="section-title">Bootstrap del estado remoto</h2>
         </div>
-        <p>Terraform guarda el estado en S3. Ese bucket debe existir antes del primer <code>terraform init</code>. El script <code>bootstrap.sh</code> lo crea y activa el versionamiento.</p>
+        <p>Terraform guarda el estado en S3. Ese bucket debe existir antes del primer <code>terraform init</code>. El
+          script <code>bootstrap.sh</code> lo crea y activa el versionamiento.</p>
 
         <div class="callout callout-warn">
-          Ejecutar este paso una sola vez. Si el bucket ya existe, el script dará un error de "already exists" — puedes ignorarlo y continuar.
+          Ejecutar este paso una sola vez. Si el bucket ya existe, el script dará un error de "already exists" — puedes
+          ignorarlo y continuar.
         </div>
 
         <pre><code class="language-bash">chmod +x scripts/bootstrap.sh
@@ -365,7 +460,8 @@
         <pre><code class="language-bash">terraform init -reconfigure</code></pre>
 
         <div class="callout callout-info">
-          El flag <code>-reconfigure</code> acepta la configuración actual del backend sin intentar migrar estado anterior.
+          El flag <code>-reconfigure</code> acepta la configuración actual del backend sin intentar migrar estado
+          anterior.
         </div>
       </section>
 
@@ -375,7 +471,8 @@
           <div class="step-badge">Paso 2</div>
           <h2 class="section-title">Crear el repositorio ECR y hacer push de la imagen</h2>
         </div>
-        <p>La Lambda 3 usa una imagen de contenedor. AWS Lambda requiere que esa imagen exista en ECR antes de crear la función. Si ejecutas <code>terraform apply</code> sin la imagen, el despliegue falla.</p>
+        <p>La Lambda 3 usa una imagen de contenedor. AWS Lambda requiere que esa imagen exista en ECR antes de crear la
+          función. Si ejecutas <code>terraform apply</code> sin la imagen, el despliegue falla.</p>
 
         <p>Ubícate en la carpeta del Dockerfile:</p>
         <pre><code class="language-bash">cd scripts/stglmbagroocrprocessorue1</code></pre>
@@ -393,7 +490,8 @@ echo "→ Repo:    ${REPO}"
 aws ecr create-repository --repository-name ${REPO} --region ${REGION} --profile ${PROFILE}</code></pre>
 
         <div class="callout callout-warn">
-          Las llaves <code>${}</code> son obligatorias en zsh. Sin ellas, <code>$REPO:latest</code> se interpreta como <code>${REPO:l}atest</code> (modificador de lowercase), generando un nombre de imagen incorrecto.
+          Las llaves <code>${}</code> son obligatorias en zsh. Sin ellas, <code>$REPO:latest</code> se interpreta como
+          <code>${REPO:l}atest</code> (modificador de lowercase), generando un nombre de imagen incorrecto.
         </div>
 
         <p>Autenticación, build y push:</p>
@@ -405,7 +503,8 @@ docker build --no-cache --provenance=false --platform linux/amd64 -t ${REPO}:lat
 docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest
 docker push ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest</code></pre>
 
-        <p>El flag <code>--platform linux/amd64</code> es necesario si compilas en Mac con Apple Silicon. Lambda corre en x86_64.</p>
+        <p>El flag <code>--platform linux/amd64</code> es necesario si compilas en Mac con Apple Silicon. Lambda corre
+          en x86_64.</p>
 
         <p>Copia la URI resultante y agrégala en <code>terraform.tfvars</code>:</p>
         <pre><code class="language-hcl">lambda_ocr_image_uri = "123456789012.dkr.ecr.us-east-1.amazonaws.com/stgecragroocrprocessorue1:latest"</code></pre>
@@ -423,10 +522,13 @@ docker push ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest</code><
 terraform plan -out=tfplan
 terraform apply tfplan</code></pre>
 
-        <p>Terraform creará en orden: el bucket S3 de recursos, los roles IAM, el Lambda Layer, las tres Lambdas, la State Machine de Step Functions, la regla de EventBridge y los dos secretos de Secrets Manager (con valores dummy).</p>
+        <p>Terraform creará en orden: el bucket S3 de recursos, los roles IAM, el Lambda Layer, las tres Lambdas, la
+          State Machine de Step Functions, la regla de EventBridge y los dos secretos de Secrets Manager (con valores
+          dummy).</p>
 
         <div class="callout callout-info">
-          El archivo <code>tfplan</code> está en el <code>.gitignore</code>. No lo commitees — puede contener ARNs y datos sensibles de la cuenta.
+          El archivo <code>tfplan</code> está en el <code>.gitignore</code>. No lo commitees — puede contener ARNs y
+          datos sensibles de la cuenta.
         </div>
 
         <p>El apply completo tarda entre 2 y 5 minutos.</p>
@@ -438,10 +540,13 @@ terraform apply tfplan</code></pre>
           <div class="step-badge">Paso 4</div>
           <h2 class="section-title">Inyección de secretos</h2>
         </div>
-        <p>Terraform crea los secretos con valores dummy. Las Lambdas no funcionarán hasta que actualices estos valores manualmente en la consola de AWS.</p>
+        <p>Terraform crea los secretos con valores dummy. Las Lambdas no funcionarán hasta que actualices estos valores
+          manualmente en la consola de AWS.</p>
 
         <div class="callout callout-warn">
-          Nunca pongas credenciales reales en <code>terraform.tfvars</code> ni en ningún archivo del repo. El bloque <code>lifecycle { ignore_changes = [secret_string] }</code> garantiza que Terraform no sobreescriba los valores que ingreses aquí.
+          Nunca pongas credenciales reales en <code>terraform.tfvars</code> ni en ningún archivo del repo. El bloque
+          <code>lifecycle { ignore_changes = [secret_string] }</code> garantiza que Terraform no sobreescriba los
+          valores que ingreses aquí.
         </div>
 
         <p>Ve a <strong>AWS Secrets Manager</strong> en <code>us-east-1</code> y actualiza cada secreto:</p>
@@ -467,10 +572,88 @@ terraform apply tfplan</code></pre>
         <p>Una vez actualizados, el pipeline está listo para ejecutarse al día siguiente a la 01:00 AM UTC.</p>
       </section>
 
+      <!-- Step 5 -->
+      <section id="step5" class="section">
+        <div class="step-header">
+          <div class="step-badge">Paso 5</div>
+          <h2 class="section-title">Setup de Base de Datos (MongoDB Atlas)</h2>
+        </div>
+        <p>Antes de que la API y el pipeline funcionen correctamente, es necesario inicializar la estructura lógica de
+          la base de datos en MongoDB Atlas.</p>
+
+        <div class="api-grid">
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-cloud"></i>
+              <span>1. Configuración en Atlas</span>
+            </div>
+            <ul class="api-list">
+              <li><strong>Cluster:</strong> Crear un clúster gratuito (M0 Sandbox).</li>
+              <li><strong>Network Access:</strong> Agregar <code>0.0.0.0/0</code> para acceso temporal.</li>
+              <li><strong>Database Access:</strong> Crear usuario con rol <code>Read and write to any database</code>.
+              </li>
+            </ul>
+          </div>
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-terminal"></i>
+              <span>2. Inicialización (setup.js)</span>
+            </div>
+            <p>Conéctate vía <strong>MongoDB Compass</strong> y abre la terminal <code>MONGOSH</code>:</p>
+            <pre><code class="language-javascript">// Copia el contenido de setup.js y ejecútalo
+load("scripts/mongodb/setup.js")</code></pre>
+            <p>Esto creará automáticamente las colecciones: <code>locations</code>, <code>crops</code>,
+              <code>events</code>, etc.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          El script también configura los <strong>Índices de Rendimiento</strong> necesarios para filtros rápidos en el
+          dashboard.
+        </div>
+      </section>
+
+      <!-- Step 6 -->
+      <section id="step6" class="section">
+        <div class="step-header">
+          <div class="step-badge">Paso 6</div>
+          <h2 class="section-title">Configuración de API Gateway y Seguridad</h2>
+        </div>
+        <p>Para exponer la Lambda de Spring Cloud Function de forma segura y controlada, configuramos Amazon API
+          Gateway.</p>
+
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-route"></i></div>
+            <h3>Recurso Proxy</h3>
+            <p>Se utiliza la ruta <code>/{proxy+}</code> con el método <code>ANY</code> e integración Lambda (Proxy
+              Integration).</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>CORS & Origen</h3>
+            <p>Configura el método <code>OPTIONS</code> permitiendo el origen específico de tu despliegue en
+              <strong>Vercel</strong>.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-gauge-high"></i></div>
+            <h3>Control de Tráfico</h3>
+            <p><strong>Usage Plan:</strong> Rate: 10 req/s | Burst: 20.<br>Requiere header <code>x-api-key</code>.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-warn">
+          <strong>Header Crítico:</strong> Es obligatorio enviar <code>spring.cloud.function.definition</code> con el
+          nombre del bean (ej: <code>getSummary</code>) en cada petición.
+        </div>
+      </section>
+
       <!-- API REST Section -->
       <section id="api" class="section">
         <h2 class="section-title">API REST (Spring Cloud Function)</h2>
-        <p>La API de AgroAlerta actúa como el puente entre los datos almacenados en MongoDB y la aplicación web. Está diseñada siguiendo una <strong>Arquitectura Hexagonal</strong> para separar la lógica de negocio de los detalles de implementación.</p>
+        <p>La API de AgroAlerta actúa como el puente entre los datos almacenados en MongoDB y la aplicación web. Está
+          diseñada siguiendo una <strong>Arquitectura Hexagonal</strong> para separar la lógica de negocio de los
+          detalles de implementación.</p>
 
         <div class="api-grid">
           <div class="api-card">
@@ -490,29 +673,119 @@ terraform apply tfplan</code></pre>
               <span>Configuración AWS Lambda</span>
             </div>
             <p>Para el despliegue se utiliza un <strong>AWS Handler</strong> específico:</p>
-            <code class="block-code">org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest</code>
-            <p>Es indispensable incluir el header <code>spring.cloud.function.definition</code> en las peticiones para seleccionar el servicio (ej. <code>getSummary</code>).</p>
+            <code
+              class="block-code">org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest</code>
+            <p>Es indispensable incluir el header <code>spring.cloud.function.definition</code> en las peticiones para
+              seleccionar el servicio (ej. <code>getSummary</code>).</p>
           </div>
         </div>
 
         <h3 class="subsection-title">Endpoints Principales</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Bean / Función</th><th>Método</th><th>Descripción</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Bean / Función</th>
+                <th>Método</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>getSummary</code></td><td><span class="badge-get">GET</span></td><td>Resumen estadístico global de riesgos.</td></tr>
-              <tr><td><code>searchAlerts</code></td><td><span class="badge-get">GET</span></td><td>Búsqueda paginada con filtros (región, riesgo, fecha).</td></tr>
-              <tr><td><code>getReport</code></td><td><span class="badge-get">GET</span></td><td>Generación de datos para reportes descargables.</td></tr>
-              <tr><td><code>findAlertById</code></td><td><span class="badge-post">POST</span></td><td>Detalle técnico de una alerta específica.</td></tr>
+              <tr>
+                <td><code>getSummary</code></td>
+                <td><span class="badge-get">GET</span></td>
+                <td>Resumen estadístico global de riesgos.</td>
+              </tr>
+              <tr>
+                <td><code>searchAlerts</code></td>
+                <td><span class="badge-get">GET</span></td>
+                <td>Búsqueda paginada con filtros (región, riesgo, fecha).</td>
+              </tr>
+              <tr>
+                <td><code>getReport</code></td>
+                <td><span class="badge-get">GET</span></td>
+                <td>Generación de datos para reportes descargables.</td>
+              </tr>
+              <tr>
+                <td><code>findAlertById</code></td>
+                <td><span class="badge-post">POST</span></td>
+                <td>Detalle técnico de una alerta específica.</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </section>
 
+      <!-- Database Section -->
+      <section id="database" class="section">
+        <h2 class="section-title">Arquitectura de Datos (MongoDB Atlas)</h2>
+        <p>El sistema utiliza una base de datos NoSQL para manejar la flexibilidad de los datos extraídos por IA y la
+          rapidez de las consultas geográficas.</p>
+
+        <div class="api-grid">
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-table-list"></i>
+              <span>Colecciones Principales</span>
+            </div>
+            <ul class="api-list">
+              <li><strong>documents_risk_alerts:</strong> Data transaccional de alertas.</li>
+              <li><strong>locations:</strong> Catálogo maestro de departamentos y provincias.</li>
+              <li><strong>crops & events:</strong> Catálogos de cultivos y fenómenos.</li>
+              <li><strong>official_sources:</strong> Fuentes de datos (SENAMHI, etc).</li>
+            </ul>
+          </div>
+          <div class="api-card">
+            <div class="api-header">
+              <i class="fas fa-bolt-lightning"></i>
+              <span>Índices de Rendimiento</span>
+            </div>
+            <div class="table-wrap">
+              <table class="tech-table">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo</th>
+                    <th>Propósito</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>risk</code></td>
+                    <td>ASC</td>
+                    <td>Filtro de severidad</td>
+                  </tr>
+                  <tr>
+                    <td><code>event.id</code></td>
+                    <td>ASC</td>
+                    <td>Filtro por fenómeno</td>
+                  </tr>
+                  <tr>
+                    <td><code>risk_date</code></td>
+                    <td>DESC</td>
+                    <td>Orden cronológico</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="subsection-title">Esquema de Alerta (documents_risk_alerts)</h3>
+        <pre><code class="language-json">{
+  "risk": "ALTO",
+  "event": { "id": "lluvia_fuerte" },
+  "location": { "department": "AREQUIPA", "province": "CAYLLOMA" },
+  "risk_date": "2024-05-12T10:00:00Z",
+  "source": "SENAMHI"
+}</code></pre>
+      </section>
+
       <!-- Web App Section -->
       <section id="webapp" class="section">
         <h2 class="section-title">Aplicación Web (Next.js 15)</h2>
-        <p>El dashboard interactivo permite la visualización geográfica y el análisis de las alertas procesadas. Utiliza <strong>Server Actions</strong> para una comunicación eficiente con la API.</p>
+        <p>El dashboard interactivo permite la visualización geográfica y el análisis de las alertas procesadas. Utiliza
+          <strong>Server Actions</strong> para una comunicación eficiente con la API.</p>
 
         <div class="web-mockup-container">
           <div class="web-mockup">
@@ -541,7 +814,8 @@ terraform apply tfplan</code></pre>
           </div>
         </div>
         <div class="callout callout-info" style="margin-top: 24px;">
-          <strong>Despliegue en Vercel:</strong> Solo requiere conectar el repositorio y configurar <code>NEXT_PUBLIC_API_URL</code> con la URL de la función Lambda.
+          <strong>Configuración:</strong> Requiere configurar <code>NEXT_PUBLIC_API_URL</code> con el endpoint del
+          <strong>API Gateway (Stage)</strong> y la <code>x-api-key</code> para el consumo de datos.
         </div>
       </section>
 
@@ -552,15 +826,49 @@ terraform apply tfplan</code></pre>
         <h3 class="subsection-title">Lambda 1 – Scraper</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Variable</th><th>Valor / Origen</th><th>Descripción</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Valor / Origen</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>URL_TARGET</code></td><td><code>terraform.tfvars</code></td><td>URL del portal de SENAMHI</td></tr>
-              <tr><td><code>USER_AGENT</code></td><td><code>terraform.tfvars</code></td><td>Header HTTP para el scraper</td></tr>
-              <tr><td><code>MONGO_SECRET_NAME</code></td><td>Secrets Manager</td><td>Nombre del secreto de MongoDB</td></tr>
-              <tr><td><code>MONGO_DB_NAME</code></td><td><code>terraform.tfvars</code></td><td>Base de datos MongoDB</td></tr>
-              <tr><td><code>TABLE_METADATA</code></td><td><code>terraform.tfvars</code></td><td>Colección de metadatos</td></tr>
-              <tr><td><code>CULTIVOS_OBJETIVO</code></td><td><code>terraform.tfvars</code></td><td>Lista de cultivos a filtrar</td></tr>
-              <tr><td><code>MONTHS_TO_FETCH</code></td><td><code>terraform.tfvars</code></td><td>Meses hacia atrás para buscar</td></tr>
+              <tr>
+                <td><code>URL_TARGET</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>URL del portal de SENAMHI</td>
+              </tr>
+              <tr>
+                <td><code>USER_AGENT</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Header HTTP para el scraper</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_SECRET_NAME</code></td>
+                <td>Secrets Manager</td>
+                <td>Nombre del secreto de MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_DB_NAME</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Base de datos MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>TABLE_METADATA</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Colección de metadatos</td>
+              </tr>
+              <tr>
+                <td><code>CULTIVOS_OBJETIVO</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Lista de cultivos a filtrar</td>
+              </tr>
+              <tr>
+                <td><code>MONTHS_TO_FETCH</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Meses hacia atrás para buscar</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -568,13 +876,39 @@ terraform apply tfplan</code></pre>
         <h3 class="subsection-title">Lambda 2 – Downloader</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Variable</th><th>Valor / Origen</th><th>Descripción</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Valor / Origen</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>BUCKET_NAME</code></td><td>Output módulo S3</td><td>Bucket donde se guardan los PDFs</td></tr>
-              <tr><td><code>S3_BASE_FOLDER</code></td><td><code>terraform.tfvars</code></td><td>Prefijo en S3 para los PDFs</td></tr>
-              <tr><td><code>MONGO_SECRET_NAME</code></td><td>Secrets Manager</td><td>Nombre del secreto de MongoDB</td></tr>
-              <tr><td><code>MONGO_DB_NAME</code></td><td><code>terraform.tfvars</code></td><td>Base de datos MongoDB</td></tr>
-              <tr><td><code>TABLE_METADATA</code></td><td><code>terraform.tfvars</code></td><td>Colección de metadatos</td></tr>
+              <tr>
+                <td><code>BUCKET_NAME</code></td>
+                <td>Output módulo S3</td>
+                <td>Bucket donde se guardan los PDFs</td>
+              </tr>
+              <tr>
+                <td><code>S3_BASE_FOLDER</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Prefijo en S3 para los PDFs</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_SECRET_NAME</code></td>
+                <td>Secrets Manager</td>
+                <td>Nombre del secreto de MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_DB_NAME</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Base de datos MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>TABLE_METADATA</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Colección de metadatos</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -582,22 +916,79 @@ terraform apply tfplan</code></pre>
         <h3 class="subsection-title">Lambda 3 – OCR / IA</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Variable</th><th>Valor / Origen</th><th>Descripción</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Valor / Origen</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>SECRET_NAME_GEMINI</code></td><td>Secrets Manager</td><td>Nombre del secreto con la API Key de Gemini</td></tr>
-              <tr><td><code>MODEL_ID</code></td><td><code>terraform.tfvars</code></td><td>Modelo Gemini: <code>models/gemini-2.5-flash</code></td></tr>
-              <tr><td><code>PROMPT_BUCKET</code></td><td>Output módulo S3</td><td>Bucket con el shapefile y recursos</td></tr>
-              <tr><td><code>KEY_ZIP</code></td><td><code>terraform.tfvars</code></td><td>S3 key del shapefile INEI</td></tr>
-              <tr><td><code>SECRET_NAME_MONGO</code></td><td>Secrets Manager</td><td>Nombre del secreto de MongoDB</td></tr>
-              <tr><td><code>MONGO_DB_NAME</code></td><td><code>terraform.tfvars</code></td><td>Base de datos MongoDB</td></tr>
-              <tr><td><code>TABLE_METADATA</code></td><td><code>terraform.tfvars</code></td><td>Colección de metadatos</td></tr>
-              <tr><td><code>MONGO_COLLECTION_NAME</code></td><td><code>terraform.tfvars</code></td><td>Colección principal de resultados</td></tr>
-              <tr><td><code>MONGO_COLLECTION_RECOMMENDATIONS</code></td><td><code>terraform.tfvars</code></td><td>Colección de recomendaciones IA</td></tr>
-              <tr><td><code>MONGO_COLLECTION_CROPS</code></td><td><code>terraform.tfvars</code></td><td>Catálogo de cultivos</td></tr>
-              <tr><td><code>MONGO_COLLECTION_EVENTS</code></td><td><code>terraform.tfvars</code></td><td>Catálogo de eventos climáticos</td></tr>
-              <tr><td><code>MONGO_COLLECTION_LOCATIONS</code></td><td><code>terraform.tfvars</code></td><td>Catálogo de ubicaciones</td></tr>
-              <tr><td><code>MONGO_COLLECTION_SOURCES</code></td><td><code>terraform.tfvars</code></td><td>Fuentes oficiales</td></tr>
-              <tr><td><code>MONGO_COLLECTION_DOMAINS</code></td><td><code>terraform.tfvars</code></td><td>Dominios SENAMHI</td></tr>
+              <tr>
+                <td><code>SECRET_NAME_GEMINI</code></td>
+                <td>Secrets Manager</td>
+                <td>Nombre del secreto con la API Key de Gemini</td>
+              </tr>
+              <tr>
+                <td><code>MODEL_ID</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Modelo Gemini: <code>models/gemini-2.5-flash</code></td>
+              </tr>
+              <tr>
+                <td><code>PROMPT_BUCKET</code></td>
+                <td>Output módulo S3</td>
+                <td>Bucket con el shapefile y recursos</td>
+              </tr>
+              <tr>
+                <td><code>KEY_ZIP</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>S3 key del shapefile INEI</td>
+              </tr>
+              <tr>
+                <td><code>SECRET_NAME_MONGO</code></td>
+                <td>Secrets Manager</td>
+                <td>Nombre del secreto de MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_DB_NAME</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Base de datos MongoDB</td>
+              </tr>
+              <tr>
+                <td><code>TABLE_METADATA</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Colección de metadatos</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_NAME</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Colección principal de resultados</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_RECOMMENDATIONS</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Colección de recomendaciones IA</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_CROPS</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Catálogo de cultivos</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_EVENTS</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Catálogo de eventos climáticos</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_LOCATIONS</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Catálogo de ubicaciones</td>
+              </tr>
+              <tr>
+                <td><code>MONGO_COLLECTION_SOURCES</code></td>
+                <td><code>terraform.tfvars</code></td>
+                <td>Fuentes oficiales</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -605,10 +996,24 @@ terraform apply tfplan</code></pre>
         <h3 class="subsection-title">API REST – Backend</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Variable</th><th>Descripción</th><th>Uso</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Descripción</th>
+                <th>Valor Ejemplo</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>MONGO_URI</code></td><td>Cadena de conexión de MongoDB Atlas</td><td>Acceso a datos estructurados</td></tr>
-              <tr><td><code>CORS_ORIGIN</code></td><td>URL de la Aplicación Web</td><td>Seguridad y acceso cross-origin</td></tr>
+              <tr>
+                <td><code>MONGO_URI</code></td>
+                <td>Cadena de conexión de MongoDB Atlas</td>
+                <td><code>mongodb+srv://...</code></td>
+              </tr>
+              <tr>
+                <td><code>CORS_ORIGIN</code></td>
+                <td>URL de la Aplicación Web (Vercel)</td>
+                <td><code>https://agroalerta.vercel.app</code></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -616,10 +1021,29 @@ terraform apply tfplan</code></pre>
         <h3 class="subsection-title">Aplicación Web – Frontend</h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Variable</th><th>Descripción</th><th>Uso</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Variable</th>
+                <th>Descripción</th>
+                <th>Uso</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td>URL de la Lambda (API)</td><td>Consumo de servicios</td></tr>
-              <tr><td><code>NEXT_PUBLIC_NOMINATIM_URL</code></td><td>URL de Geocodificación</td><td>Búsqueda de direcciones en mapa</td></tr>
+              <tr>
+                <td><code>NEXT_PUBLIC_API_URL</code></td>
+                <td>Endpoint del API Gateway (Stage)</td>
+                <td>Consumo de servicios vía Proxy</td>
+              </tr>
+              <tr>
+                <td><code>NEXT_PUBLIC_API_KEY</code></td>
+                <td>Llave de API (x-api-key)</td>
+                <td>Autorización en el Usage Plan</td>
+              </tr>
+              <tr>
+                <td><code>NEXT_PUBLIC_NOMINATIM_URL</code></td>
+                <td>URL de Geocodificación</td>
+                <td>Búsqueda en mapa interactivo</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -632,32 +1056,38 @@ terraform apply tfplan</code></pre>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-bucket"></i></div>
             <strong>s3</strong>
-            <p>Bucket de recursos con cifrado AES-256 y bloqueo público. Sube automáticamente scripts Python, el layer de dependencias y el shapefile INEI.</p>
+            <p>Bucket de recursos con cifrado AES-256 y bloqueo público. Sube automáticamente scripts Python, el layer
+              de dependencias y el shapefile INEI.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-user-shield"></i></div>
             <strong>iam_roles</strong>
-            <p>Roles y políticas de mínimo privilegio para cada Lambda, Step Functions y EventBridge. Los ARNs de secretos son exactos, sin wildcards.</p>
+            <p>Roles y políticas de mínimo privilegio para cada Lambda, Step Functions y EventBridge. Los ARNs de
+              secretos son exactos, sin wildcards.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-bolt"></i></div>
             <strong>lambda</strong>
-            <p>Tres funciones Lambda con sus respectivos CloudWatch Log Groups. Lambdas 1 y 2 comparten un Layer de dependencias Python. Lambda 3 usa imagen ECR.</p>
+            <p>Tres funciones Lambda con sus respectivos CloudWatch Log Groups. Lambdas 1 y 2 comparten un Layer de
+              dependencias Python. Lambda 3 usa imagen ECR.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-diagram-project"></i></div>
             <strong>step_functions</strong>
-            <p>State Machine definida en JSON con <code>templatefile()</code> para inyectar ARNs de Lambda dinámicamente. Incluye reintentos y catch global.</p>
+            <p>State Machine definida en JSON con <code>templatefile()</code> para inyectar ARNs de Lambda
+              dinámicamente. Incluye reintentos y catch global.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-calendar-check"></i></div>
             <strong>eventbridge</strong>
-            <p>Regla con expresión cron configurable. Trigger diario hacia Step Functions con rol de invocación dedicado.</p>
+            <p>Regla con expresión cron configurable. Trigger diario hacia Step Functions con rol de invocación
+              dedicado.</p>
           </div>
           <div class="module-card">
             <div class="module-icon"><i class="fas fa-lock"></i></div>
             <strong>secrets_manager</strong>
-            <p>Dos secretos inicializados con valores dummy. El bloque <code>ignore_changes</code> evita que Terraform sobreescriba los valores reales ingresados post-deploy.</p>
+            <p>Dos secretos inicializados con valores dummy. El bloque <code>ignore_changes</code> evita que Terraform
+              sobreescriba los valores reales ingresados post-deploy.</p>
           </div>
         </div>
       </section>
@@ -679,16 +1109,54 @@ terraform apply tfplan</code></pre>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Tipo</th><th>Abreviatura</th><th>Ejemplo completo</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Abreviatura</th>
+                <th>Ejemplo completo</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>S3 Bucket</td><td><code>s3</code></td><td><code>stgs3agrorecursosue1</code></td></tr>
-              <tr><td>Lambda</td><td><code>lmb</code></td><td><code>stglmbagroocrprocessorue1</code></td></tr>
-              <tr><td>IAM Role</td><td><code>iam</code></td><td><code>stgiamagroscraperue1</code></td></tr>
-              <tr><td>Step Functions</td><td><code>sfn</code></td><td><code>stgsfnagroocrpipelineue1</code></td></tr>
-              <tr><td>EventBridge Rule</td><td><code>evb</code></td><td><code>stgevbagroweeklytriggerue1</code></td></tr>
-              <tr><td>ECR Repository</td><td><code>ecr</code></td><td><code>stgecragroocrprocessorue1</code></td></tr>
-              <tr><td>Lambda Layer</td><td><code>lyr</code></td><td><code>stglyragrodepsue1</code></td></tr>
-              <tr><td>Secret</td><td><code>sec</code></td><td><code>stgsecagromongoue1</code></td></tr>
+              <tr>
+                <td>S3 Bucket</td>
+                <td><code>s3</code></td>
+                <td><code>stgs3agrorecursosue1</code></td>
+              </tr>
+              <tr>
+                <td>Lambda</td>
+                <td><code>lmb</code></td>
+                <td><code>stglmbagroocrprocessorue1</code></td>
+              </tr>
+              <tr>
+                <td>IAM Role</td>
+                <td><code>iam</code></td>
+                <td><code>stgiamagroscraperue1</code></td>
+              </tr>
+              <tr>
+                <td>Step Functions</td>
+                <td><code>sfn</code></td>
+                <td><code>stgsfnagroocrpipelineue1</code></td>
+              </tr>
+              <tr>
+                <td>EventBridge Rule</td>
+                <td><code>evb</code></td>
+                <td><code>stgevbagroweeklytriggerue1</code></td>
+              </tr>
+              <tr>
+                <td>ECR Repository</td>
+                <td><code>ecr</code></td>
+                <td><code>stgecragroocrprocessorue1</code></td>
+              </tr>
+              <tr>
+                <td>Lambda Layer</td>
+                <td><code>lyr</code></td>
+                <td><code>stglyragrodepsue1</code></td>
+              </tr>
+              <tr>
+                <td>Secret</td>
+                <td><code>sec</code></td>
+                <td><code>stgsecagromongoue1</code></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -704,35 +1172,48 @@ terraform apply tfplan</code></pre>
             <div class="sec-icon"><i class="fas fa-minimize"></i></div>
             <div>
               <strong>Mínimo privilegio en IAM</strong>
-              <p>Cada Lambda tiene su propio rol con acceso únicamente a los recursos que necesita. Los ARNs de los secretos están especificados de forma exacta en las políticas — sin wildcards.</p>
+              <p>Cada Lambda tiene su propio rol con acceso únicamente a los recursos que necesita. Los ARNs de los
+                secretos están especificados de forma exacta en las políticas — sin wildcards.</p>
+            </div>
+          </div>
+          <div class="sec-item">
+            <div class="sec-icon"><i class="fas fa-network-wired"></i></div>
+            <div>
+              <strong>Seguridad en API Gateway</strong>
+              <p>Se implementa un <strong>Usage Plan</strong> con una tasa de 10 req/s y un burst de 20. El acceso está
+                restringido mediante <strong>API Keys</strong> obligatorias en el header <code>x-api-key</code>.</p>
             </div>
           </div>
           <div class="sec-item">
             <div class="sec-icon"><i class="fas fa-lock"></i></div>
             <div>
               <strong>Credenciales en Secrets Manager</strong>
-              <p>MongoDB credentials y la Gemini API Key se almacenan en AWS Secrets Manager. Las Lambdas los leen en runtime usando el nombre del secreto inyectado como variable de entorno.</p>
+              <p>MongoDB credentials y la Gemini API Key se almacenan en AWS Secrets Manager. Las Lambdas los leen en
+                runtime usando el nombre del secreto inyectado como variable de entorno.</p>
             </div>
           </div>
           <div class="sec-item">
             <div class="sec-icon"><i class="fas fa-code-commit"></i></div>
             <div>
               <strong>Valores dummy con <code>ignore_changes</code></strong>
-              <p>Terraform inicializa los secretos con valores temporales y luego los ignora. Esto permite actualizar el secret_string manualmente sin que el próximo <code>terraform apply</code> lo revierta.</p>
+              <p>Terraform inicializa los secretos con valores temporales y luego los ignora. Esto permite actualizar el
+                secret_string manualmente sin que el próximo <code>terraform apply</code> lo revierta.</p>
             </div>
           </div>
           <div class="sec-item">
             <div class="sec-icon"><i class="fas fa-user-tag"></i></div>
             <div>
               <strong>Perfiles nombrados de AWS</strong>
-              <p>Todos los comandos usan <code>--profile agro-stg</code>. El provider de Terraform también usa <code>profile = var.aws_profile</code>. Esto evita despliegues accidentales en la cuenta personal.</p>
+              <p>Todos los comandos usan <code>--profile agro-stg</code>. El provider de Terraform también usa
+                <code>profile = var.aws_profile</code>. Esto evita despliegues accidentales en la cuenta personal.</p>
             </div>
           </div>
           <div class="sec-item">
             <div class="sec-icon"><i class="fas fa-shield-halved"></i></div>
             <div>
               <strong>S3 con acceso público bloqueado</strong>
-              <p>El bucket de recursos tiene <code>block_public_acls = true</code> y cifrado AES-256 activado por defecto. El bucket de estado Terraform también.</p>
+              <p>El bucket de recursos tiene <code>block_public_acls = true</code> y cifrado AES-256 activado por
+                defecto. El bucket de estado Terraform también.</p>
             </div>
           </div>
         </div>
@@ -744,9 +1225,12 @@ terraform apply tfplan</code></pre>
 
         <div class="faq-list">
           <div class="faq-item">
-            <div class="faq-q">El repositorio ECR muestra un nombre como <code>stgecragroocrprocessorue1atest</code></div>
+            <div class="faq-q">El repositorio ECR muestra un nombre como <code>stgecragroocrprocessorue1atest</code>
+            </div>
             <div class="faq-a">
-              <p>Es un problema de zsh. La sintaxis <code>$REPO:latest</code> se interpreta como <code>${REPO:l}atest</code> donde <code>:l</code> es el modificador de lowercase. Usa siempre llaves:</p>
+              <p>Es un problema de zsh. La sintaxis <code>$REPO:latest</code> se interpreta como
+                <code>${REPO:l}atest</code> donde <code>:l</code> es el modificador de lowercase. Usa siempre llaves:
+              </p>
               <pre><code class="language-bash">docker build -t ${REPO}:latest .
 docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:latest</code></pre>
             </div>
@@ -755,7 +1239,8 @@ docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:
           <div class="faq-item">
             <div class="faq-q"><code>terraform init</code> falla con error 403 Forbidden en S3</div>
             <div class="faq-a">
-              <p>El backend de Terraform no puede usar variables (<code>var.aws_profile</code>), así que ignora el perfil del provider. Verifica que <code>backend.tf</code> tenga el perfil hardcodeado:</p>
+              <p>El backend de Terraform no puede usar variables (<code>var.aws_profile</code>), así que ignora el
+                perfil del provider. Verifica que <code>backend.tf</code> tenga el perfil hardcodeado:</p>
               <pre><code class="language-hcl">backend "s3" {
   bucket  = "stgs3agroterraformstateue1"
   key     = "agro-alerta/terraform.tfstate"
@@ -775,16 +1260,20 @@ docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:
           </div>
 
           <div class="faq-item">
-            <div class="faq-q"><code>terraform apply</code> falla al crear la Lambda 3 con error de imagen no encontrada</div>
+            <div class="faq-q"><code>terraform apply</code> falla al crear la Lambda 3 con error de imagen no encontrada
+            </div>
             <div class="faq-a">
-              <p>La imagen ECR debe existir antes del apply. Completa el Paso 2 (build + push) y actualiza <code>lambda_ocr_image_uri</code> en <code>terraform.tfvars</code> con la URI completa incluyendo <code>:latest</code>.</p>
+              <p>La imagen ECR debe existir antes del apply. Completa el Paso 2 (build + push) y actualiza
+                <code>lambda_ocr_image_uri</code> en <code>terraform.tfvars</code> con la URI completa incluyendo
+                <code>:latest</code>.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <div class="faq-q">El <code>docker push</code> va a la cuenta equivocada</div>
             <div class="faq-a">
-              <p>El <code>ACCOUNT_ID</code> se obtiene sin especificar perfil, tomando las credenciales por defecto del sistema. Siempre pasa el perfil al obtener el Account ID:</p>
+              <p>El <code>ACCOUNT_ID</code> se obtiene sin especificar perfil, tomando las credenciales por defecto del
+                sistema. Siempre pasa el perfil al obtener el Account ID:</p>
               <pre><code class="language-bash">ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text --profile ${PROFILE})</code></pre>
             </div>
           </div>
@@ -792,7 +1281,8 @@ docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:
           <div class="faq-item">
             <div class="faq-q">Las Lambdas se despliegan pero no procesan — MongoDB connection timeout</div>
             <div class="faq-a">
-              <p>Los secretos en Secrets Manager todavía tienen los valores dummy de Terraform. Ve al paso 4 y actualiza <code>stgsecagromongoue1</code> con las credenciales reales de tu cluster de MongoDB Atlas.</p>
+              <p>Los secretos en Secrets Manager todavía tienen los valores dummy de Terraform. Ve al paso 4 y actualiza
+                <code>stgsecagromongoue1</code> con las credenciales reales de tu cluster de MongoDB Atlas.</p>
             </div>
           </div>
         </div>
@@ -800,7 +1290,8 @@ docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:
 
       <footer class="footer">
         <p>AgroAlerta · Tesis 2026 · Infraestructura desplegada en AWS us-east-1</p>
-        <a href="https://github.com/RodLA/agroalerta" target="_blank"><i class="fab fa-github"></i> github.com/RodLA/agroalerta</a>
+        <a href="https://github.com/RodLA/agroalerta" target="_blank"><i class="fab fa-github"></i>
+          github.com/RodLA/agroalerta</a>
       </footer>
 
     </div>
@@ -809,4 +1300,5 @@ docker tag ${REPO}:latest ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="js/main.js"></script>
 </body>
+
 </html>
