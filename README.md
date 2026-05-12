@@ -78,18 +78,49 @@ El despliegue en AWS requiere que el artefacto esté configurado correctamente c
     *   Ve a **Configuración** -> **Configuración de la versión ejecutable**.
     *   Haz clic en **Editar** y pon el siguiente controlador:
         `org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest`
-4.  **Habilitar URL**: En la sección de Configuración, habilita la **URL de la función**.
-5.  **Variables**: Agrega `MONGO_URI` y `CORS_ORIGIN` en el apartado de configuración de la Lambda.
+4.  **Variables**: Agrega `MONGO_URI` y `CORS_ORIGIN` en el apartado de configuración de la Lambda.
+
+---
+
+## 🌐 Configuración de API Gateway
+
+Para exponer la Lambda y gestionar el tráfico de forma segura, se utiliza **Amazon API Gateway** (de tipo **API REST**) con la siguiente configuración:
+
+1.  **Creación de Recurso**: Se crea un recurso de tipo **Proxy Resource** con la ruta `/{proxy+}`.
+2.  **Método ANY**: Dentro del recurso proxy, se configura el método `ANY` con **Integración Lambda**, apuntando a la función creada anteriormente.
+3.  **Configuración de CORS**:
+    *   Se crea el método **OPTIONS** dentro del recurso `/{proxy+}`.
+    *   En la configuración de CORS, se agrega el **Origin** correspondiente a la web desplegada en **Vercel**.
+4.  **Headers obligatorios**: Asegurarse de que el gateway permita el paso del header `spring.cloud.function.definition`.
+5.  **Despliegue**: Se crea una etapa denominada **Stage** para poder implementar y activar el API.
+
+---
+
+## 🛡️ Seguridad y Control de Tráfico
+
+Se ha implementado un esquema de seguridad y limitación de peticiones mediante **Usage Plans** y **API Keys**:
+
+1.  **Plan de Uso**:
+    *   **Tasa (Rate)**: 10 peticiones por segundo.
+    *   **Ampliación (Burst)**: 20 peticiones.
+2.  **API Key**:
+    *   Se genera una **API Key** única.
+    *   Se asocia la API Key al **Plan de Uso**.
+    *   Se asocia el Plan de Uso a la etapa **Stage** creada anteriormente.
 
 ---
 
 ## 🔗 Endpoints
 
-Para invocar las funciones en Lambda, es **obligatorio** incluir el header `spring.cloud.function.definition` con el nombre del Bean correspondiente.
+Para invocar las funciones a través del API Gateway, es **obligatorio** incluir los siguientes headers en la petición:
 
-### Configuración del Header
-*   **Key**: `spring.cloud.function.definition`
-*   **Value**: Nombre de la función (ej: `getSummary`).
+### Headers Requeridos
+*   **`spring.cloud.function.definition`**: Nombre de la función a ejecutar (ej: `getSummary`).
+*   **`x-api-key`**: La llave de API autorizada para el Plan de Uso.
+
+### URL de Invocación
+La URL base sigue el formato:
+`https://{api-id}.execute-api.{region}.amazonaws.com/Stage/{functionName}`
 
 ### Detalle de Funciones
 
@@ -112,4 +143,5 @@ Para invocar las funciones en Lambda, es **obligatorio** incluir el header `spri
 1.  **Codificación**: Desarrollar bajo capas de dominio, aplicación e infraestructura.
 2.  **Packaging**: Generar JAR con perfil `-aws`.
 3.  **Lambda Setup**: Subir JAR y configurar el Handler `FunctionInvoker`.
-4.  **Consumo**: Enviar peticiones HTTP a la URL de la función incluyendo el header de definición.
+4.  **API Gateway**: Configurar recurso proxy `/{proxy+}`, habilitar CORS (Vercel) y asociar Plan de Uso con API Key.
+5.  **Consumo**: Enviar peticiones HTTP al endpoint del API Gateway en la etapa `Stage`, incluyendo los headers `spring.cloud.function.definition` y `x-api-key`.
